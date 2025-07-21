@@ -43,9 +43,9 @@ public class CamadaFisicaTransmissora {
     } // Fim do Switch
 
     controller.setTextFieldCodificada(auxiliar.arrayToString(fluxoBrutoDeBits)); // Mostra a mensagem em bits, codificada na caixa de texto
-
+    String erro = controller.getComboBoxErro();
     // Chamada do meio de comunicacao para enviar os dados
     MeioDeComunicacao meio = new MeioDeComunicacao();
-    meio.transferir(fluxoBrutoDeBits, codificacao, controller);
+    meio.transferir(fluxoBrutoDeBits, codificacao, erro, controller);
   } // Fim do metodo
 } // Fim da classe

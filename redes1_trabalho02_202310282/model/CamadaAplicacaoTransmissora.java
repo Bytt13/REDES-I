@@ -38,11 +38,11 @@ public class CamadaAplicacaoTransmissora {
         quadroDeBits[indice] = Character.getNumericValue(binario.charAt(j));
       }
     }
-    controller.setTextFieldBits(bitsString.toString()); // Mostra a mensagem em bits no campo de texto
+    String enquadramento = controller.getComboBoxEnquadramento(); //Pega o tipo de enquadramento selecionado
 
     // Chama a proxima camada, e transmite a mensagem em bits para ela
-    CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
-    fisicaTx.transmitir(quadroDeBits, codificacao, controller);
+    CamadaEnlaceDadosTransmissora enlaceTx = new CamadaEnlaceDadosTransmissora();
+    enlaceTx.transmitir(quadroDeBits, codificacao, enquadramento, controller);
 
   }
 }

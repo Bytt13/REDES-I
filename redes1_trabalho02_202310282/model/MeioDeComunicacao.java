@@ -17,10 +17,11 @@ public class MeioDeComunicacao {
 * Funcao: transfere a mensagem em forma de bits codificados para a proxima camada
 * @param int[] fluxoBrutoDeBits | fluxo de bits recebido
 * @param String codificacao | codificacao escolhida
+* @param String erro | taxa de erro escolhida
 * @param TelaPrincipalController controller | controller para conseguirmos gerenciar a tela
 * @return void 
 * ********************************************************* */
-  public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, TelaPrincipalController controller)
+  public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, String erro, TelaPrincipalController controller)
   {
     controller.setTextFieldSinal(controller.getTextFieldCodificada()); // Mostra a mensagem codificada no painel receptor
 

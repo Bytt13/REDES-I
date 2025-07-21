@@ -33,7 +33,7 @@
               <Font size="21.0" />
             </font>
         </Button>
-        <Label fx:id="labelMensagemBits" prefHeight="45.0" prefWidth="299.0" text="Mensagem em bits">
+        <Label fx:id="labelMensagemBits" prefHeight="45.0" prefWidth="299.0" text="Mensagem em bits (enquadrados)">
             <font>
               <Font size="21.0" />
             </font>

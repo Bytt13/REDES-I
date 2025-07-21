@@ -4,9 +4,12 @@ Autor..............: Lucas de Menezes Chaves
 * Inicio...........: 
 * Ultima alteracao.: 
 * Nome.............: FuncoesAuxiliares
-* Funcao...........: Codifica e decodifica bits, e transformas arrays em strings
+* Funcao...........: Codifica e decodifica bits, transformas arrays em strings, enquadra os bits, a parte mais "calculo" ou "reutilizavel" do programa
 *************************************************************** */
 package utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FuncoesAuxiliares {
   /**************************************************************
@@ -27,6 +30,40 @@ public class FuncoesAuxiliares {
   } // Fim do metodo
 
   /**************************************************************
+  * Metodo: arrayListToArrayInt
+  * Funcao: transforma o arrayList em um array de int
+  * @param int[] array | bits
+  * @return int[] array | array int
+  * ********************************************************* */
+  public int[] arrayListToArrayInt(ArrayList<Integer> list)
+  {
+    int[] array = new int[list.size()]; //declara o array int que a funcao vai retornar
+    //Loop para preencher o array
+    for(int i = 0; i < list.size(); i++)
+    {
+      array[i] = list.get(i);
+    }
+
+    return array;
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: addAll
+  * Funcao: transforma o arrayList em um array de int
+  * @param ArrayList<Integer> list | lista que vamos pegar os elementos
+  * @param int[] array | bits
+  * @return void
+  * ********************************************************* */
+  public void addAll(ArrayList<Integer> list, int[] array)
+  {
+    for(int bit : array)
+    {
+      list.add(bit);
+    }
+  } // Fim do metodo
+
+
+  /**************************************************************
   * Metodo: codificacaoBinaria
   * Funcao: envia a mensagem (em bits) codificada em binario para a proxima camada
   * @param int[] bits | mensagem recebida (em bits)
@@ -44,24 +81,31 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] codificacaoManchester(int[] bits)
   {
-    int[] manchester = new int[bits.length * 2]; // Cria um array para armazenar a mensagem codificada
-    //Loop para realizar a codificacao
-    for(int i = 0; i < bits.length; i++)
-    {
-      //O bit 0 eh representado por uma transicao de baixo para alto (01)
-      if(bits[i] == 0) 
-      {
-        manchester[i * 2] = 0;
-        manchester[i * 2 + 1] = 1;
-      }
-      // O bit 1 eh representado por uma transicao de alto para baixo (10)
-      else
-      {
-        manchester[i * 2] = 1;
-        manchester[i * 2 + 1] = 0;
+  // A lista eh mais flexivel para tamanhos variaveis
+    ArrayList<Integer> manchester = new ArrayList<>();
+    //Loop para codificar atualizado com o enquadramento
+    for (int bit : bits) {
+      switch (bit) {
+        case 0: // Regra normal para o bit 0
+          manchester.add(0);
+          manchester.add(1);
+          break;
+        case 1: // Regra normal para o bit 1
+          manchester.add(1);
+          manchester.add(0);
+          break;
+        case 2: // Violacao de inicio
+          manchester.add(0);
+          manchester.add(0); // Sinal baixo-baixo (ilegal)
+          break;
+        case 3: // Violacao de fim
+          manchester.add(1);
+          manchester.add(1); // Sinal alto-alto (ilegal)
+          break;
       }
     }
-    return manchester;
+    // Converte o ArrayList de volta para um array de int
+    return arrayListToArrayInt(manchester); 
   } // Fim do metodo
 
   /**************************************************************
@@ -96,7 +140,7 @@ public class FuncoesAuxiliares {
     return bits; // Em binario ja eh igual aos bits
   } // Fim do metodo
 
-    /**************************************************************
+  /**************************************************************
   * Metodo: decodificacaoManchester
   * Funcao: envia a mensagem (em bits) decodificada em manchester para a proxima camada
   * @param int[] bits | mensagem recebida (em bits)
@@ -104,15 +148,24 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] decodificacaoManchester(int[] bits)
   {
-    int[] manchester = new int[bits.length / 2]; // Cria um array para armazenar a mensagem codificada
-    //Loop para realizar a codificacao
-    for(int i = 0; i < manchester.length; i++)
-    {
-      //se o par de bits for 01, o bit original eh 0, se for 10, eh 1
-      if(bits[i * 2] == 0 && bits[i * 2 + 1] == 1) manchester[i] = 0;
-      else manchester[i] = 1;
-    }
-    return manchester;
+    ArrayList<Integer> bitsDecodificados = new ArrayList<>();
+        
+        // Processa os bits em pares
+        for (int i = 0; i < bits.length; i += 2) {
+            int bit1 = bits[i];
+            int bit2 = bits[i + 1];
+
+            if (bit1 == 0 && bit2 == 1) {
+                bitsDecodificados.add(0); // Transicao baixo-alto -> bit 0
+            } else if (bit1 == 1 && bit2 == 0) {
+                bitsDecodificados.add(1); // Transicao alto-baixo -> bit 1
+            } else if (bit1 == 0 && bit2 == 0) {
+                bitsDecodificados.add(2); // Marcador de inicio
+            } else if (bit1 == 1 && bit2 == 1) {
+                bitsDecodificados.add(3); // Marcador de fim
+            }
+        }
+        return arrayListToArrayInt(bitsDecodificados);
   } // Fim do metodo
 
   /**************************************************************
@@ -136,5 +189,115 @@ public class FuncoesAuxiliares {
       ultimoNivelDeSinal = bits[i * 2 + 1];
     }
     return diferencial;
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: contagemCaracteres
+  * Funcao: envia a mensagem (em bits) enquadrada por contagem de caracteres para a proxima camada
+  * @param int[] bits | mensagem recebida (em bits)
+  * @return int[] caracteres | a mensagem enquadradada em contagem de caracteres
+  * ********************************************************* */
+  public int[] contagemCaracteres(int[] bits)
+  {
+    int numeroBytes = bits.length / 8; // Conta quantos bytes a mensagem tem
+    String binarioDoTamanho= String.format("%8s", Integer.toBinaryString(numeroBytes)).replace(' ', '0'); // Converte o numero de bytes para um array de 8 bits
+
+    int[] cabecalho = new int[8]; //Cria um array para conseguirmos enquadrar os bits
+    //Loop para enquadrar
+    for(int i = 0; i < 8; i++)
+    {
+      cabecalho[i] = Character.getNumericValue(binarioDoTamanho.charAt(i));
+    }
+
+    int[] caracteres = new int[bits.length + 8]; // Cria o array que vai ser retornado pela funcao
+    System.arraycopy(cabecalho, 0, caracteres, 0, 8);
+    System.arraycopy(bits, 0, caracteres, 8, bits.length);
+
+    return caracteres; //retorna o quadro enquadrado
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: insercaoBytes
+  * Funcao: envia a mensagem (em bits) enquadrada por insercao de bytes para a proxima camada
+  * @param int[] bits | mensagem recebida (em bits)
+  * @return int[] insercaoBytes | a mensagem enquadradada em insercao de bytes
+  * ********************************************************* */
+  public int[] insercaoBytes(int[] bits)
+  {
+    ArrayList<Integer> quadroComStuffing = new ArrayList<>(); // Cria o quadro com stuffing
+    int[] FLAG = {0,1,1,1,1,1,1,0}; // Cria a FLAG 0x7E
+    int[] ESC = {0,1,1,1,1,1,0,1}; // Cria a ESC 0x7D
+
+    addAll(quadroComStuffing, FLAG); // Adiciona a FLAG no inicio
+
+    //Loop para enquadrar
+    for(int i = 0; i < bits.length; i++)
+    {
+      int[] chunk = Arrays.copyOfRange(bits, i, i + 8);
+      if(Arrays.equals(chunk, FLAG) || Arrays.equals(chunk, ESC))
+      {
+        addAll(quadroComStuffing, ESC); // Insere o byte de escape
+      }
+      addAll(quadroComStuffing, chunk); // Adiciona o byte original
+    }
+    addAll(quadroComStuffing, FLAG); // Adiciona a FLAG no final
+
+    return arrayListToArrayInt(quadroComStuffing);
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: insercaoBits
+  * Funcao: envia a mensagem (em bits) enquadrada por insercao de bits para a proxima camada
+  * @param int[] bits | mensagem recebida (em bits)
+  * @return int[] insercaoBytes | a mensagem enquadradada em insercao de bits
+  * ********************************************************* */
+  public int[] insercaoBits(int[] bits)
+  {
+    ArrayList<Integer> quadroComStuffing = new ArrayList<>(); // Cria o quadro com stuffing
+    int[] FLAG = {0,1,1,1,1,1,1,0}; // Cria a FLAG 0x7E
+    int contadorDeUns = 0; // Cria um contador para 1's
+
+    addAll(quadroComStuffing, FLAG); // Adiciona a FLAG no inicio
+
+    //Loop para enquadrar
+    for(int bit : bits)
+    {
+      quadroComStuffing.add(bit);
+      if(bit == 1)
+      {
+        contadorDeUns++;
+        if(contadorDeUns == 5)
+        {
+          quadroComStuffing.add(0); //Adiciona o bit 0 (stuffing)
+          contadorDeUns = 0; // Zera o contador
+        }
+      }
+      else 
+      {
+        contadorDeUns = 0;
+      }
+    }
+
+    addAll(quadroComStuffing, FLAG); // Adiciona a FLAG no final
+
+    return arrayListToArrayInt(quadroComStuffing);
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: violacaoFisica
+  * Funcao: envia a mensagem (em bits) enquadrada por Violacao da camada fisica para a proxima camada
+  * @param int[] bits | mensagem recebida (em bits)
+  * @return int[] violacao | a mensagem enquadradada em Violacao da camada fisica
+  * ********************************************************* */
+  public int[] violacaoFisica(int[] bits)
+  {
+    // 2 = sinal J
+    // 3 = sinal K
+    int[] violacao =new int[bits.length + 2]; // Cria o array que vamos retornar
+    violacao[0] = 2; // Marcador de inicio
+    System.arraycopy(bits, 0, violacao, 1, bits.length);
+    
+    violacao[violacao.length - 1] = 3; // Marcador de fim
+    return violacao;
   }
-}
+} 

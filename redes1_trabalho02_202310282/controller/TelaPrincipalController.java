@@ -95,7 +95,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldBits(String texto)
   {
-  textFieldBits.setText(texto);
+    textFieldBits.setText(texto);
   }
   /****************************************************************
   * Metodo: setTextFieldCodificada
@@ -105,7 +105,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldCodificada(String texto)
   {
-  textFieldCodificada.setText(texto);
+    textFieldCodificada.setText(texto);
   }
   /****************************************************************
   * Metodo: setTextFieldSinal
@@ -115,17 +115,17 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldSinal(String texto)
   {
-  textFieldSinal.setText(texto);
+    textFieldSinal.setText(texto);
   }
   /****************************************************************
   * Metodo: getTextFieldCodificada
-  * Funcao: muda o texto do text field da mensagem em bits codificada
+  * Funcao: retorna o texto da caixa
   * @param void
   * @return String | texto que esta na caixa de texto codificada
   * ********************************************************* */
   public String getTextFieldCodificada()
   {
-  return textFieldCodificada.getText();
+    return textFieldCodificada.getText();
   }
   /****************************************************************
   * Metodo: setTextFieldDecodificada
@@ -135,7 +135,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldDecodificada(String texto)
   {
-  textFieldDecodificada.setText(texto);
+    textFieldDecodificada.setText(texto);
   }
     /****************************************************************
   * Metodo: setTextAreaMensagemFinal
@@ -145,6 +145,26 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextAreaMensagemFinal(String texto)
   {
-  textAreaMensagemFinal.setText(texto);
+    textAreaMensagemFinal.setText(texto);
+  }
+  /****************************************************************
+  * Metodo: getComboBoxEnquadramento
+  * Funcao: retorna o tipo de enquadramento
+  * @param void
+  * @return String | texto que esta na caixa de texto codificada
+  * ********************************************************* */
+  public String getComboBoxEnquadramento()
+  {
+    return comboBoxEnquadramento.getValue();
+  }
+   /****************************************************************
+  * Metodo: getComboBoxErro
+  * Funcao: retorna a taxa de erro
+  * @param void
+  * @return String | texto que esta na caixa de texto codificada
+  * ********************************************************* */
+  public String getComboBoxErro()
+  {
+    return comboBoxErro.getValue();
   }
 }
