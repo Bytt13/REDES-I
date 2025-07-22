@@ -62,8 +62,8 @@ public class CamadaEnlaceDadosTransmissora {
       default: 
         quadroEnquadrado = auxiliar.contagemCaracteres(bits);
         break;
-    }
+    } // Fim do switch
 
     return quadroEnquadrado;
-  }
+  } // Fim do metodo
 }

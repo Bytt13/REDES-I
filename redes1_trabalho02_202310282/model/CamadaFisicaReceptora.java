@@ -46,7 +46,7 @@ public class CamadaFisicaReceptora {
     controller.setTextFieldDecodificada(sequenciaDeBits); // Mostra os bits na GUI
 
     // Chama a proxima camada
-    CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-    camadaAppRx.receber(fluxoDeBits, controller);
+    CamadaEnlaceDadosRepectora enlaceRx = new CamadaEnlaceDadosRepectora();
+    enlaceRx.receber(fluxoDeBits, controller);
   } // Fim do Metodo
 } // Fim da classe

@@ -299,5 +299,106 @@ public class FuncoesAuxiliares {
     
     violacao[violacao.length - 1] = 3; // Marcador de fim
     return violacao;
-  }
-} 
+  } // FIm do Metodo
+
+  /**************************************************************
+  * Metodo: desenquadroViolacaoFisica
+  * Funcao: envia a mensagem (em bits) desenquadrada por Violacao da camada fisica para a proxima camada
+  * @param int[] quadroEnquadrado | mensagem recebida (em bits)
+  * @return int[] violacao | a mensagem deenquadradada
+  * ********************************************************* */
+  public int[] desenquadroViolacaoFisica(int[] quadroEnquadrado)
+  {
+    //Verificando a violacao da camada fisica
+    if(quadroEnquadrado.length >= 2 && quadroEnquadrado[0] == 2 && quadroEnquadrado[quadroEnquadrado.length - 1] == 3)
+    {
+      int[] violacao = new int[quadroEnquadrado.length - 2];
+      System.arraycopy(quadroEnquadrado, 1, violacao, 0, violacao.length);
+      return violacao;
+    }
+    // Caso nao detecte nada, houve um erro
+    return new int[0];
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: desenquadroContagemCaracteres
+  * Funcao: envia a mensagem (em bits) desenquadrada por Contagem de Caracteres para a proxima camada
+  * @param int[] quadroEnquadrado | mensagem recebida (em bits)
+  * @return int[] | a mensagem deenquadradada
+  * ********************************************************* */
+  public int[] desenquadroContagemCaracteres(int[] quadroEnquadrado)
+  {
+    //le os primeiros 8 bits para saber o tamanho
+    int[] cabecalho = Arrays.copyOfRange(quadroEnquadrado, 0, 8);
+    StringBuilder binarioDoTamanho = new StringBuilder();
+    // Percorre e transforma o tamanho em binario
+    for(int bit : cabecalho)
+    {
+      binarioDoTamanho.append(bit); // Forma a string
+    }
+
+    int tamanho = Integer.parseInt(binarioDoTamanho.toString(), 2); // Retorna o tamanho
+    return Arrays.copyOfRange(quadroEnquadrado, 8, 8 + (tamanho * 8)); // Retorna o quadro desenquadrado
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: desenquadroInsercaoBits
+  * Funcao: envia a mensagem (em bits) desenquadrada por Insercao de bits para a proxima camada
+  * @param int[] quadroEnquadrado | mensagem recebida (em bits)
+  * @return int[] quadroSemStuffing | a mensagem deenquadradada
+  * ********************************************************* */
+  public int[] desenquadroInsercaoBits(int[] quadroEnquadrado)
+  {
+    ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que vai armazenar o quadro de bits desenquadrado
+    int contadorDeUns = 0;
+    // Ignora a FLAG inicial e inicia o Loop para desenquadrar
+    for(int i = 8; i < quadroEnquadrado.length - 8; i++)
+    {
+      int bit = quadroEnquadrado[i];
+      if(contadorDeUns == 5 & bit == 0)
+      {
+        contadorDeUns = 0; //eh um bit de stuffing, entao ignoramos
+      }
+      else
+      {
+        quadroSemStuffing.add(bit);
+        if(bit == 1) contadorDeUns++;
+        else contadorDeUns = 0;
+      }
+    }
+
+    return arrayListToArrayInt(quadroSemStuffing);
+  } // Fim do metodo
+
+  /**************************************************************
+  * Metodo: desenquadroInsercaoBytes
+  * Funcao: envia a mensagem (em bits) desenquadrada por Insercao de bytes para a proxima camada
+  * @param int[] quadroEnquadrado | mensagem recebida (em bits)
+  * @return int[] quadroSemStuffing | a mensagem deenquadradada
+  * ********************************************************* */
+  public int[] desenquadroInsercaoBytes(int[] quadroEnquadrado)
+  {
+    ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que vai armazenar o quadro de bits desenquadrado
+    int[] FLAG = {0,1,1,1,1,1,1,0}; // FLAG reversa
+    int[] ESC = {0,1,1,1,1,1,0,1}; // ESC reverso
+
+    // Ignora a FLAG inicial e final
+    for(int i = 8; i < quadroEnquadrado.length - 8; i += 8)
+    {
+      int[] chunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8); // Cria o chunk
+      //verifica se o chunk é um ESC
+      if(Arrays.equals(chunk, ESC))
+      {
+        i += 8;
+        int[] proximoChunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8);
+        addAll(quadroSemStuffing, proximoChunk);
+      }
+      else
+      {
+        addAll(quadroSemStuffing, chunk);
+      }
+    }
+
+    return arrayListToArrayInt(quadroSemStuffing);
+  } // Fim do metodo
+}
