@@ -11,7 +11,7 @@ package model;
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
 
-public class CamadaEnlaceDadosRepectora {
+public class CamadaEnlaceDadosReceptora {
 /**************************************************************
 * Metodo: receber
 * Funcao: recebe os bits e passa eles para camada seguinte já desenquadrados
