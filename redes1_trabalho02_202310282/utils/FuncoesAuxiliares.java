@@ -116,18 +116,44 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] codificacaoManchesterDiferencial(int[] bits)
   {
-    int[] diferencial = new int[bits.length * 2]; // Cria o array para armazenar a mensagem codificada em manchester diferencial
+    ArrayList<Integer> diferencial = new ArrayList<>(); // Cria o array para armazenar a mensagem codificada em manchester diferencial
     int nivelSinalAtual = 1; // Nivel de sinal que comecamos
     //Loop para codificar em manchester diferencial
-    for(int i = 0; i < bits.length; i++)
+    for(int bit: bits)
     {
-      if(bits[i] == 0) nivelSinalAtual = 1 - nivelSinalAtual; // Inverte o sinal no bit 0, no bit 1 nao ocorre transicao
-      diferencial[i * 2] = nivelSinalAtual;
-      nivelSinalAtual = 1 - nivelSinalAtual; // Inverte para segunda metade
-      diferencial[i * 2 + 1] = nivelSinalAtual;
+      switch(bit)
+      {
+        case 0:
+          // Para o bit 0, ha uma transicao no inicio do periodo
+          nivelSinalAtual = 1 - nivelSinalAtual;
+          diferencial.add(nivelSinalAtual);
+          // Transicao obrigatoria no meio do periodo
+          nivelSinalAtual = 1 - nivelSinalAtual;
+          diferencial.add(nivelSinalAtual);
+          break;
+        case 1:
+          // Para o bit 1, NAO ha transicao no inicio do periodo
+          diferencial.add(nivelSinalAtual);
+          // Transicao obrigatoria no meio do periodo
+          nivelSinalAtual = 1 - nivelSinalAtual;
+          diferencial.add(nivelSinalAtual);
+          break;
+        case 2: // Por causa da violacao fisica
+          // Forca o sinal ilegal baixo-baixo
+          diferencial.add(0);
+          diferencial.add(0);
+          nivelSinalAtual = 0;
+          break;
+        case 3:
+          //Logica inversa ao 2
+          diferencial.add(1);
+          diferencial.add(1);
+          nivelSinalAtual = 1;
+          break;
+      }
     }
 
-    return diferencial; 
+    return arrayListToArrayInt(diferencial); 
   } // Fim do metodo
 
   /**************************************************************
@@ -176,19 +202,34 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] decodificacaoDiferencial(int[] bits)
   {
-    int[] diferencial = new int[bits.length / 2];
+    ArrayList<Integer> diferencial = new ArrayList<>();
     int ultimoNivelDeSinal = 1; //mesmo nivel de sinal anterior
     //Loop para decodificar os bits
-    for(int i = 0; i < diferencial.length; i++)
+    for(int i = 0; i < bits.length; i += 2)
     {
-      int primeiroNivelDeSinal = bits[i * 2];
+      int primeiroSinal = bits[i];
+      int segundoSinal = bits[i+1];
       // Se o nivel do sinal no inicio do bit for diferente do nivel no final do bit anterior, foi um 0
-      if(primeiroNivelDeSinal != ultimoNivelDeSinal) diferencial[i] = 0;
-      else diferencial[i] = 1;
+      if(primeiroSinal == segundoSinal) 
+      {
+        if(primeiroSinal == 0)
+        {
+          diferencial.add(2);
+        }
+        else
+        {
+          diferencial.add(3);
+        }
+      }
+      else 
+      {
+        if(primeiroSinal != ultimoNivelDeSinal) diferencial.add(0);
+        else diferencial.add(1);
+      }
       // O ultimo nivel deste bit eh o segundo sinal do par
-      ultimoNivelDeSinal = bits[i * 2 + 1];
+      ultimoNivelDeSinal = segundoSinal;
     }
-    return diferencial;
+    return arrayListToArrayInt(diferencial);
   } // Fim do metodo
 
   /**************************************************************
@@ -231,7 +272,7 @@ public class FuncoesAuxiliares {
     addAll(quadroComStuffing, FLAG); // Adiciona a FLAG no inicio
 
     //Loop para enquadrar
-    for(int i = 0; i < bits.length; i++)
+    for(int i = 0; i < bits.length; i += 8)
     {
       int[] chunk = Arrays.copyOfRange(bits, i, i + 8);
       if(Arrays.equals(chunk, FLAG) || Arrays.equals(chunk, ESC))
