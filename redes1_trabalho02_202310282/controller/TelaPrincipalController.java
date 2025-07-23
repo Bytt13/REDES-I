@@ -14,6 +14,10 @@ import javafx.scene.control.TextField;
 import model.AplicacaoTransmissora;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ComboBox;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+// imports que vamos precisar
 
 public class TelaPrincipalController {
 
@@ -62,8 +66,7 @@ public class TelaPrincipalController {
     comboBoxEnquadramento.getSelectionModel().selectFirst();
     comboBoxErro.getItems().addAll("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%");
     comboBoxErro.getSelectionModel().selectFirst();
-    
-  }
+  } // Fim do metodo
   /**************************************************************
   * Metodo: botao
   * Funcao: faz o botao iniciar a simulacao
@@ -85,7 +88,7 @@ public class TelaPrincipalController {
     // Chamada da camada de aplicacao transmissora
     AplicacaoTransmissora appTx = new AplicacaoTransmissora();
     appTx.enviarMensagem(mensagem, codificacao, this);
-  }
+  } // Fim do metodo
 
   /****************************************************************
   * Metodo: setTextFieldBits
@@ -96,7 +99,7 @@ public class TelaPrincipalController {
   public void setTextFieldBits(String texto)
   {
     textFieldBits.setText(texto);
-  }
+  } // Fim do metodo
   /****************************************************************
   * Metodo: setTextFieldCodificada
   * Funcao: muda o texto do text field da mensagem em bits codificada
@@ -106,7 +109,7 @@ public class TelaPrincipalController {
   public void setTextFieldCodificada(String texto)
   {
     textFieldCodificada.setText(texto);
-  }
+  } // Fim do metodo
   /****************************************************************
   * Metodo: setTextFieldSinal
   * Funcao: muda o texto do text field do sinal recebido
@@ -116,7 +119,7 @@ public class TelaPrincipalController {
   public void setTextFieldSinal(String texto)
   {
     textFieldSinal.setText(texto);
-  }
+  } // Fim do metodo
   /****************************************************************
   * Metodo: getTextFieldCodificada
   * Funcao: retorna o texto da caixa
@@ -126,7 +129,7 @@ public class TelaPrincipalController {
   public String getTextFieldCodificada()
   {
     return textFieldCodificada.getText();
-  }
+  } // Fim do metodo
   /****************************************************************
   * Metodo: setTextFieldDecodificada
   * Funcao: muda o texto do text field da mensagem em bits decodificada
@@ -136,7 +139,7 @@ public class TelaPrincipalController {
   public void setTextFieldDecodificada(String texto)
   {
     textFieldDecodificada.setText(texto);
-  }
+  } // Fim do metodo
     /****************************************************************
   * Metodo: setTextAreaMensagemFinal
   * Funcao: muda o texto do text area da mensagem final
@@ -146,7 +149,7 @@ public class TelaPrincipalController {
   public void setTextAreaMensagemFinal(String texto)
   {
     textAreaMensagemFinal.setText(texto);
-  }
+  } // Fim do metodo
   /****************************************************************
   * Metodo: getComboBoxEnquadramento
   * Funcao: retorna o tipo de enquadramento
@@ -156,7 +159,7 @@ public class TelaPrincipalController {
   public String getComboBoxEnquadramento()
   {
     return comboBoxEnquadramento.getValue();
-  }
+  } // Fim do metodo
    /****************************************************************
   * Metodo: getComboBoxErro
   * Funcao: retorna a taxa de erro
@@ -166,5 +169,22 @@ public class TelaPrincipalController {
   public String getComboBoxErro()
   {
     return comboBoxErro.getValue();
-  }
+  } // Fim do metodo
+  /**************************************************************
+* Metodo: exibirAlertaDeErro
+* Funcao: Mostra um pop-up de alerta na tela informando sobre o erro.
+* @param String mensagem | A mensagem a ser exibida no alerta.
+* @return void
+* ********************************************************* */
+  public void emitirErro(String mensagem)
+  {
+    Platform.runLater(() -> {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Erro de Transmissão");
+      alert.setHeaderText("Um erro de paridade foi detectado!");
+      alert.setContentText(mensagem);
+
+      alert.showAndWait();
+    });
+  } // Fim do metodo
 }

@@ -12,6 +12,7 @@ import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
 
 public class CamadaEnlaceDadosReceptora {
+  FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria objeto de funcoes auxiliares para termos rapidez na hora de programar
 /**************************************************************
 * Metodo: receber
 * Funcao: recebe os bits e passa eles para camada seguinte já desenquadrados
@@ -39,7 +40,6 @@ public class CamadaEnlaceDadosReceptora {
 * ********************************************************* */
   private int[] desenquadrar(int[] quadroEnquadrado, String enquadramento, TelaPrincipalController controller)
   {
-    FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria objeto de funcoes auxiliares para termos rapidez na hora de programar
     int[] quadroDesenquadrado; // cria o array que vai armazenar o quadro de bits já desenquadrado
 
     // Switch para escolehr o tipo de enquadramento
@@ -61,7 +61,6 @@ public class CamadaEnlaceDadosReceptora {
         quadroDesenquadrado = auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
         break;
     } // Fim do switch
-
     return quadroDesenquadrado;
   } // Fim do metodo
 }
