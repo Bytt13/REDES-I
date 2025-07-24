@@ -24,30 +24,48 @@ public class MeioDeComunicacao {
 * ********************************************************* */
   public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, String erro, TelaPrincipalController controller)
   { 
+    int[] fluxoBrutoDeBitsPontoB = new int[fluxoBrutoDeBitsPontoA.length];
+    boolean erroOcorreu = false;
     // Simula o erro com probabilidade definida pela GUI
     try {
       String valorErro = erro.replace("%", "").trim();
       int chanceErro = Integer.parseInt(valorErro);
       // Converte a probabilidade da GUI num valor real
+      Random rand = new Random();
 
       // Tenta simular um erro se a chance dele acontecer for maior que 0
       if(chanceErro > 0)
       {
-        Random rand = new Random();
-        int numeroSorteado = rand.nextInt(100); // Sorteia um numero de 0 a 100
-
-        if(numeroSorteado < chanceErro)
+        for(int i = 0; i < fluxoBrutoDeBitsPontoA.length; i++)
         {
-          int indiceErro = rand.nextInt(fluxoBrutoDeBitsPontoA.length); // Gera uma posicao aleatoria para o bit que vai ser alterado
-          fluxoBrutoDeBitsPontoA[indiceErro] = 1 - fluxoBrutoDeBitsPontoA[indiceErro]; // Inverte o bit
-          controller.emitirErro("Ocorreu um erro!");
+          int numeroSorteado = rand.nextInt(100);
+          if(numeroSorteado < chanceErro)
+          {
+            fluxoBrutoDeBitsPontoB[i] = 1 - fluxoBrutoDeBitsPontoA[i];
+            erroOcorreu = true;
+          }
+          else
+          {
+            fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i];
+          }
         }
+      }
+      if(erroOcorreu)
+      {
+        controller.emitirErro("Ocorreu um erro");
       }
     } catch(NumberFormatException e) // Caso haja alguma excecao
     {
       e.printStackTrace();
     }
-    controller.setTextFieldSinal(controller.getTextFieldCodificada()); // Mostra a mensagem codificada no painel receptor
+    
+    StringBuilder bitsParaMostrar = new StringBuilder(); // Cria o string builder
+    for(int bit : fluxoBrutoDeBitsPontoB)
+    {
+      bitsParaMostrar.append(bit);
+    }
+
+    controller.setTextFieldSinal(bitsParaMostrar.toString()); // Mostra a mensagem codificada no painel receptor
 
     // Repassa a mensagem para proxima camada
     CamadaFisicaReceptora fisicaRx = new CamadaFisicaReceptora();
