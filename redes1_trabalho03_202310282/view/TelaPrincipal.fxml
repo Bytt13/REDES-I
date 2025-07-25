@@ -28,8 +28,8 @@
                         <ComboBox fx:id="comboBoxControleErro" prefHeight="27.0" prefWidth="435.0" promptText="Controle de Erro" />
                      </children>
                   </HBox>
-                  <ComboBox fx:id="comboBoxEnquadramento" prefHeight="27.0" prefWidth="303.0" promptText="Enquadramento" />
               <ComboBox fx:id="comboBoxCodificacao" prefHeight="27.0" prefWidth="302.0" promptText="Codificação" />
+                  <ComboBox fx:id="comboBoxEnquadramento" prefHeight="27.0" prefWidth="303.0" promptText="Enquadramento" />
                </children>
             </VBox>
             <HBox prefHeight="0.0" prefWidth="300.0" />

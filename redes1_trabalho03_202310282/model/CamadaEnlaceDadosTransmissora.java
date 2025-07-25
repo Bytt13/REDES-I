@@ -25,8 +25,8 @@ public class CamadaEnlaceDadosTransmissora {
   * ********************************************************* */
  public void transmitir(int[] bits, String codificacao, String enquadramento, TelaPrincipalController controller)
  {
-    int[] quadroEnquadrado = enquadramento(bits, enquadramento); // Chama a funcao de enquadramento e passa o quadro de bits enquadrados para proxima camada
-    quadroEnquadrado = controleErro(bits, controller);
+    int[] bitsVerificados = controleErro(bits, controller);
+    int[] quadroEnquadrado = enquadramento(bitsVerificados, enquadramento); // Chama a funcao de enquadramento e passa o quadro de bits enquadrados para proxima camada
     controller.setTextFieldBits(auxiliar.arrayToString(quadroEnquadrado)); //mostra os bits enquadrados na GUI
 
     // Chama a proxima caamda para realizar a codificacao e continuar a transmissao

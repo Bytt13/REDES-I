@@ -505,7 +505,6 @@ public class FuncoesAuxiliares {
     }
     else
     {
-      controller.emitirErro("FALHA! Houve um erro na verificacao");
       return null;
     }
   } // Fim do metodo
@@ -570,7 +569,6 @@ public class FuncoesAuxiliares {
     }
     else
     {
-      controller.emitirErro("FALHA! Houve um erro na verificacao");
       return null;
     }
   } // Fim do metodo

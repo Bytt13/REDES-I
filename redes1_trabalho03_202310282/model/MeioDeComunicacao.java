@@ -25,7 +25,6 @@ public class MeioDeComunicacao {
   public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, String erro, TelaPrincipalController controller)
   { 
     int[] fluxoBrutoDeBitsPontoB = new int[fluxoBrutoDeBitsPontoA.length];
-    boolean erroOcorreu = false;
     // Simula o erro com probabilidade definida pela GUI
     try {
       String valorErro = erro.replace("%", "").trim();
@@ -42,17 +41,12 @@ public class MeioDeComunicacao {
           if(numeroSorteado < chanceErro)
           {
             fluxoBrutoDeBitsPontoB[i] = 1 - fluxoBrutoDeBitsPontoA[i];
-            erroOcorreu = true;
           }
           else
           {
             fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i];
           }
         }
-      }
-      if(erroOcorreu)
-      {
-        controller.emitirErro("Ocorreu um erro");
       }
     } catch(NumberFormatException e) // Caso haja alguma excecao
     {
@@ -69,6 +63,6 @@ public class MeioDeComunicacao {
 
     // Repassa a mensagem para proxima camada
     CamadaFisicaReceptora fisicaRx = new CamadaFisicaReceptora();
-    fisicaRx.receber(fluxoBrutoDeBitsPontoA, codificacao, controller);
+    fisicaRx.receber(fluxoBrutoDeBitsPontoB, codificacao, controller);
   }
 }

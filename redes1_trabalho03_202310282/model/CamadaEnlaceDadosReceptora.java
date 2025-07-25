@@ -27,8 +27,16 @@ public class CamadaEnlaceDadosReceptora {
     int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
-    CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-    camadaAppRx.receber(quadroDeBitsVerificado, controller);
+    if(quadroDeBitsVerificado != null)
+    {
+      CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+      camadaAppRx.receber(quadroDeBitsVerificado, controller);
+    }
+    else
+    {
+      controller.emitirErro("Um erro foi detectado e descartado com sucesso");
+    }
+
   } // Fim do metodo
 
 /**************************************************************
