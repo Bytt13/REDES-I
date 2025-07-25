@@ -11,6 +11,8 @@ package utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import controller.TelaPrincipalController;
+
 public class FuncoesAuxiliares {
   /**************************************************************
   * Metodo: arrayToString
@@ -451,7 +453,28 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] paridadePar(int[] quadro)
   {
-    int[] par;
+    int[] par = new int[quadro.length + 1];
+    int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
+    //Loop para contar os bits 1 do quadro original
+    for(int bit : quadro)
+    {
+      //Se for 1, aumenta o contador
+      if(bit == 1)
+      {
+        contadorDeUns++;
+      }
+    }
+    System.arraycopy(quadro, 0, par, 0, quadro.length);
+
+    // Se a contagem for impar ou par, muda bit de paridade
+    if(contadorDeUns % 2 != 0)
+    {
+      par[quadro.length] = 1;
+    }
+    else
+    {
+      par[quadro.length] = 0;
+    }
     return par;
   } // Fim do metodo
 
@@ -461,10 +484,30 @@ public class FuncoesAuxiliares {
   * @param int[] quadro | mensagem recebida (em bits)
   * @return int[] quadroControlado | a mensagem deenquadradada
   * ********************************************************* */
-  public int[] paridadeParVerificacao(int[] quadro)
+  public int[] paridadeParVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int[] par;
-    return par;
+    int[] par = new int[quadro.length - 1];
+    int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
+    //Loop para contar os bits 1 do quadro original
+    for(int bit : quadro)
+    {
+      //Se for 1, aumenta o contador
+      if(bit == 1)
+      {
+        contadorDeUns++;
+      }
+    }
+
+    if(contadorDeUns % 2 == 0)
+    {
+      par = Arrays.copyOfRange(quadro, 0, quadro.length - 1); // Remove o bit de paridade
+      return par;
+    }
+    else
+    {
+      controller.emitirErro("FALHA! Houve um erro na verificacao");
+      return null;
+    }
   } // Fim do metodo
 
   /**************************************************************
@@ -475,20 +518,61 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] paridadeImpar(int[] quadro)
   {
-    int[] impar;
-    return impar;
+  int[] impar = new int[quadro.length + 1];
+  int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
+  //Loop para contar os bits 1 do quadro original
+  for(int bit : quadro)
+  {
+    //Se for 1, aumenta o contador
+    if(bit == 1)
+    {
+      contadorDeUns++;
+    }
+  }
+  System.arraycopy(quadro, 0, impar, 0, quadro.length);
+
+  // Se a contagem for impar ou par, muda bit de paridade
+  if(contadorDeUns % 2 != 0)
+  {
+    impar[quadro.length] = 0;
+  }
+  else
+  {
+    impar[quadro.length] = 1;
+  }
+  return impar;
   } // Fim do metodo
 
   /**************************************************************
   * Metodo: paridadeImparVerificacao
-  * Funcao: envia a mensagem (em bits) controlada
+  * Funcao: envia a mensagem (em bits) verificada
   * @param int[] quadro | mensagem recebida (em bits)
   * @return int[] quadroControlado | a mensagem deenquadradada
   * ********************************************************* */
-  public int[] paridadeImparVerificacao(int[] quadro)
+  public int[] paridadeImparVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int [] impar;
-    return impar;
+    int[] impar = new int[quadro.length - 1];
+    int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
+    //Loop para contar os bits 1 do quadro original
+    for(int bit : quadro)
+    {
+      //Se for 1, aumenta o contador
+      if(bit == 1)
+      {
+        contadorDeUns++;
+      }
+    }
+
+    if(contadorDeUns % 2 != 0)
+    {
+      impar = Arrays.copyOfRange(quadro, 0, quadro.length - 1); // Remove o bit de paridade
+      return impar;
+    }
+    else
+    {
+      controller.emitirErro("FALHA! Houve um erro na verificacao");
+      return null;
+    }
   } // Fim do metodo
 
   /**************************************************************
@@ -499,19 +583,19 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] crc(int[] quadro)
   {
-    int[] crc;
+    int[] crc = quadro;
     return crc;
   } // Fim do metodo
 
   /**************************************************************
   * Metodo: crcVerificacao
-  * Funcao: envia a mensagem (em bits) controlada
+  * Funcao: envia a mensagem (em bits) verificada
   * @param int[] quadro | mensagem recebida (em bits)
   * @return int[] quadroControlado | a mensagem deenquadradada
   * ********************************************************* */
-  public int[] crcVerificacao(int[] quadro)
+  public int[] crcVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int[] crc;
+    int[] crc = quadro;
     return crc;
   } // Fim do metodo
   
@@ -523,19 +607,19 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] hamming(int[] quadro)
   {
-    int[] hamming;
+    int[] hamming = quadro;
     return hamming;
   } // Fim do metodo
 
   /**************************************************************
   * Metodo: hammingVerificacao
-  * Funcao: envia a mensagem (em bits) controlada
+  * Funcao: envia a mensagem (em bits) verificada
   * @param int[] quadro | mensagem recebida (em bits)
   * @return int[] quadroControlado | a mensagem deenquadradada
   * ********************************************************* */
-  public int[] hammingVerificacao(int[] quadro)
+  public int[] hammingVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int[] hamming;
+    int[] hamming = quadro;
     return hamming;
   } // Fim do metodo
 }

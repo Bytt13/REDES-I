@@ -81,16 +81,20 @@ public class CamadaEnlaceDadosReceptora {
     switch(controleErro)
     {
       case "Paridade Par":
-        quadroDeBitsVerificado = auxiliar.paridadeParVerificacao(quadroDeBits);
+        quadroDeBitsVerificado = auxiliar.paridadeParVerificacao(quadroDeBits, controller);
         break;
       case "Paridade Impar":
-        quadroDeBitsVerificado = auxiliar.paridadeImparVerificacao(quadroDeBits);
+        quadroDeBitsVerificado = auxiliar.paridadeImparVerificacao(quadroDeBits, controller);
         break;
       case "CRC":
-        quadroDeBitsVerificado = auxiliar.crcVerificacao(quadroDeBits);
+        quadroDeBitsVerificado = auxiliar.crcVerificacao(quadroDeBits, controller);
         break;
       case "Código de Hamming":
-        quadroDeBitsVerificado = auxiliar.hammingVerificacao(quadroDeBits);
+        quadroDeBitsVerificado = auxiliar.hammingVerificacao(quadroDeBits, controller);
+        break;
+      default:
+        quadroDeBitsVerificado = auxiliar.paridadeParVerificacao(quadroDeBits, controller);
+        break;
     } // Fim do switch
 
     return quadroDeBitsVerificado;

@@ -93,6 +93,10 @@ public class CamadaEnlaceDadosTransmissora {
         break;
       case "Código de Hamming":
         quadroDeBitsControlado = auxiliar.hamming(quadroDeBits);
+        break;
+      default:
+        quadroDeBitsControlado = auxiliar.paridadePar(quadroDeBits);
+        break;
     } // Fim do switch
 
     return quadroDeBitsControlado;
