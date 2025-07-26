@@ -719,8 +719,9 @@ public class FuncoesAuxiliares {
     ArrayList<Integer> dadosOriginais= new ArrayList<>();
     for(int i = 0; i < n; i++)
     {
+      int pos = i + 1;
       // Verifica se a posicao (i+1) NAO e uma potencia de 2
-      if(!((i + 1) > 0 && ((i + 1) & (i)) == 0))
+      if(!((pos > 0) && ((pos & (pos - 1)) == 0)))
       {
         dadosOriginais.add(quadro[i]);
       }
