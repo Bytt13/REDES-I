@@ -24,20 +24,26 @@ public class CamadaEnlaceDadosReceptora {
   public void receber(int[] quadroEnquadrado, TelaPrincipalController controller)
   {
     String enquadramento = controller.getComboBoxEnquadramento(); // Pega o tipo de enquadramento selecionado
-    int[] quadroDeBits = desenquadrar(quadroEnquadrado, enquadramento, controller); // Desenquadra os bits
-    int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
+    int[] quadroDeBitsVerificado = controleErro(quadroEnquadrado, controller);
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
     if(quadroDeBitsVerificado != null)
     {
+      int[] quadroDeBits = desenquadrar(quadroDeBitsVerificado, enquadramento, controller); // Desenquadra os bits
+
+      //Debug
       System.out.println("Enlace receptor - OK");
-      System.out.println(Arrays.toString(quadroDeBitsVerificado));
+      System.out.println(Arrays.toString(quadroDeBits));
+
+      //Chama a proxima camada
       CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-      camadaAppRx.receber(quadroDeBits, controller);
+      camadaAppRx.receber(quadroEnquadrado, controller);
     }
-    else
+    else if(quadroDeBitsVerificado == null)
     {
+      controller.setTextAreaMensagemFinal("");
       controller.emitirErro("Um erro foi detectado e descartado com sucesso");
+      System.out.println("Deu null");
     }
 
   } // Fim do metodo

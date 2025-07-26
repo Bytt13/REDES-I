@@ -464,6 +464,7 @@ public class FuncoesAuxiliares {
         contadorDeUns++;
       }
     }
+
     System.arraycopy(quadro, 0, par, 0, quadro.length);
 
     // Se a contagem for impar ou par, muda bit de paridade
@@ -506,7 +507,7 @@ public class FuncoesAuxiliares {
     }
     else
     {
-      return null;
+      return null; // Descarta o fluxo
     }
   } // Fim do metodo
 
@@ -570,7 +571,7 @@ public class FuncoesAuxiliares {
     }
     else
     {
-      return null;
+      return null; // Descarta o fluxo
     }
   } // Fim do metodo
 
