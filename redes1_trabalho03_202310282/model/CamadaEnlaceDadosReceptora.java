@@ -28,12 +28,12 @@ public class CamadaEnlaceDadosReceptora {
     int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
-    if(quadroDeBits != null)
+    if(quadroDeBitsVerificado != null)
     {
       System.out.println("Enlace receptor - OK");
       System.out.println(Arrays.toString(quadroDeBitsVerificado));
-      //CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-      //camadaAppRx.receber(quadroDeBits, controller);
+      CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+      camadaAppRx.receber(quadroDeBits, controller);
     }
     else
     {
