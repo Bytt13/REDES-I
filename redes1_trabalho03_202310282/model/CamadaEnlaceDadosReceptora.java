@@ -10,6 +10,7 @@ package model;
 
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
+import java.util.Arrays;
 
 public class CamadaEnlaceDadosReceptora {
   FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria objeto de funcoes auxiliares para termos rapidez na hora de programar
@@ -27,10 +28,12 @@ public class CamadaEnlaceDadosReceptora {
     int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
-    if(quadroDeBitsVerificado != null)
+    if(quadroDeBits != null)
     {
-      CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-      camadaAppRx.receber(quadroDeBitsVerificado, controller);
+      System.out.println("Enlace receptor - OK");
+      System.out.println(Arrays.toString(quadroDeBitsVerificado));
+      //CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+      //camadaAppRx.receber(quadroDeBits, controller);
     }
     else
     {
@@ -70,6 +73,7 @@ public class CamadaEnlaceDadosReceptora {
         quadroDesenquadrado = auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
         break;
     } // Fim do switch
+    System.out.println("Desenquadrado");
     return quadroDesenquadrado;
   } // Fim do metodo
 
@@ -104,7 +108,7 @@ public class CamadaEnlaceDadosReceptora {
         quadroDeBitsVerificado = auxiliar.paridadeParVerificacao(quadroDeBits, controller);
         break;
     } // Fim do switch
-
+    System.out.println("Verificado");
     return quadroDeBitsVerificado;
   }// Fim do metodo
 }

@@ -8,6 +8,7 @@ Autor..............: Lucas de Menezes Chaves
 *************************************************************** */
 package model;
 
+import java.util.Arrays;
 import java.util.Random;
 import controller.TelaPrincipalController;
 //import que vamos precisar
@@ -48,6 +49,13 @@ public class MeioDeComunicacao {
           }
         }
       }
+      else
+      {
+        for(int i = 0; i < fluxoBrutoDeBitsPontoA.length; i++)
+        {
+          fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i];
+        }
+      }
     } catch(NumberFormatException e) // Caso haja alguma excecao
     {
       e.printStackTrace();
@@ -60,7 +68,8 @@ public class MeioDeComunicacao {
     }
 
     controller.setTextFieldSinal(bitsParaMostrar.toString()); // Mostra a mensagem codificada no painel receptor
-
+    System.out.println("O codigo saiu da camada meio de comunicacao");
+    System.out.println(Arrays.toString(fluxoBrutoDeBitsPontoB));
     // Repassa a mensagem para proxima camada
     CamadaFisicaReceptora fisicaRx = new CamadaFisicaReceptora();
     fisicaRx.receber(fluxoBrutoDeBitsPontoB, codificacao, controller);

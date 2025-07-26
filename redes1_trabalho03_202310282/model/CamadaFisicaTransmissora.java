@@ -8,6 +8,8 @@
 *************************************************************** */
 package model;
 
+import java.util.Arrays;
+
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
 //imports que precisaremos
@@ -45,6 +47,8 @@ public class CamadaFisicaTransmissora {
     controller.setTextFieldCodificada(auxiliar.arrayToString(fluxoBrutoDeBits)); // Mostra a mensagem em bits, codificada na caixa de texto
     String erro = controller.getComboBoxErro();
     // Chamada do meio de comunicacao para enviar os dados
+    System.out.println("Fisica - OK");
+    System.out.println(Arrays.toString(fluxoBrutoDeBits));
     MeioDeComunicacao meio = new MeioDeComunicacao();
     meio.transferir(fluxoBrutoDeBits, codificacao, erro, controller);
   } // Fim do metodo

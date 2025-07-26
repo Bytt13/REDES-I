@@ -22,9 +22,9 @@ public class AplicacaoTransmissora {
  * ********************************************************* */
   public void enviarMensagem(String mensagem, String codificacao, TelaPrincipalController controller){
     controller.setTextFieldBits("Enviando mensagem..."); // Mostra rapidamente que a mensagem esta sendo enviada 
+    System.out.println("Enviando mensagem");
     // Chama a proxima camada
     CamadaAplicacaoTransmissora camadaAppTx = new CamadaAplicacaoTransmissora();
     camadaAppTx.transmitir(mensagem, codificacao, controller);
-
   }
 }

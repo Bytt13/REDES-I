@@ -476,6 +476,7 @@ public class FuncoesAuxiliares {
       par[quadro.length] = 0;
     }
     return par;
+
   } // Fim do metodo
 
   /**************************************************************

@@ -8,6 +8,8 @@ Autor..............: Lucas de Menezes Chaves
 *************************************************************** */
 package model;
 
+import java.util.Arrays;
+
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
 //imports que precisamos
@@ -44,7 +46,8 @@ public class CamadaFisicaReceptora {
 
     String sequenciaDeBits = auxiliar.arrayToString(fluxoDeBits); // Transforma os bits em uma string para ser mostrada na GUI
     controller.setTextFieldDecodificada(sequenciaDeBits); // Mostra os bits na GUI
-
+    System.out.println("Codigo foi decodificado");
+    System.out.println(Arrays.toString(fluxoDeBits));
     // Chama a proxima camada
     CamadaEnlaceDadosReceptora enlaceRx = new CamadaEnlaceDadosReceptora();
     enlaceRx.receber(fluxoDeBits, controller);

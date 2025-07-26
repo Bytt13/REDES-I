@@ -10,6 +10,7 @@ package model;
 
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
+import java.util.Arrays;
 //imports que vamos precisar
 
 public class CamadaEnlaceDadosTransmissora {
@@ -24,14 +25,16 @@ public class CamadaEnlaceDadosTransmissora {
   * @return void 
   * ********************************************************* */
  public void transmitir(int[] bits, String codificacao, String enquadramento, TelaPrincipalController controller)
- {
-    int[] bitsVerificados = controleErro(bits, controller);
-    int[] quadroEnquadrado = enquadramento(bitsVerificados, enquadramento); // Chama a funcao de enquadramento e passa o quadro de bits enquadrados para proxima camada
-    controller.setTextFieldBits(auxiliar.arrayToString(quadroEnquadrado)); //mostra os bits enquadrados na GUI
-
-    // Chama a proxima caamda para realizar a codificacao e continuar a transmissao
-    CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
-    fisicaTx.transmitir(quadroEnquadrado, codificacao, controller);
+ {  
+  System.out.println("Vai verificar");
+  int[] bitsVerificados = controleErro(bits, controller);
+  int[] quadroEnquadrado = enquadramento(bitsVerificados, enquadramento); // Chama a funcao de enquadramento e passa o quadro de bits enquadrados para proxima camada
+  controller.setTextFieldBits(auxiliar.arrayToString(quadroEnquadrado)); //mostra os bits enquadrados na GUI
+  System.out.println("Enlace - OK");
+  System.out.println(Arrays.toString(bitsVerificados));
+  // Chama a proxima caamda para realizar a codificacao e continuar a transmissao
+  CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
+  fisicaTx.transmitir(quadroEnquadrado, codificacao, controller);
  }
    /**************************************************************
   * Metodo: enquadramento
@@ -98,7 +101,7 @@ public class CamadaEnlaceDadosTransmissora {
         quadroDeBitsControlado = auxiliar.paridadePar(quadroDeBits);
         break;
     } // Fim do switch
-
+    System.out.println("o codigo saiu do controle de erro transmissor");
     return quadroDeBitsControlado;
   } // Fim do metodo
 }

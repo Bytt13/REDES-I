@@ -9,6 +9,8 @@
 package model;
 
 import controller.TelaPrincipalController;
+import java.util.Arrays;
+// imports utilizados
 
 public class CamadaAplicacaoTransmissora {
 /**************************************************************
@@ -39,10 +41,9 @@ public class CamadaAplicacaoTransmissora {
       }
     }
     String enquadramento = controller.getComboBoxEnquadramento(); //Pega o tipo de enquadramento selecionado
-
+    System.out.println(Arrays.toString(quadroDeBits));
     // Chama a proxima camada, e transmite a mensagem em bits para ela
     CamadaEnlaceDadosTransmissora enlaceTx = new CamadaEnlaceDadosTransmissora();
     enlaceTx.transmitir(quadroDeBits, codificacao, enquadramento, controller);
-
   }
 }
