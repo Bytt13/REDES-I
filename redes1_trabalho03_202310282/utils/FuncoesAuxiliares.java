@@ -607,7 +607,61 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] hamming(int[] quadro)
   {
-    int[] hamming = quadro;
+    int m = quadro.length; // bits de dados
+    int r = 1; // bits de paridade
+
+    // 1. Calcular quantos bits de paridade (r) sao necessarios.
+    // A formula eh: 2^r >= m + r + 1
+    while(Math.pow(2, r) < m + r + 1)
+    {
+      r++;
+    } // Fim do while
+    System.out.println("Bits de paridade = ");
+    System.out.println(r);
+
+    int n = m + r; // Tamanho total do quadro
+    int[] hamming = new int[n];
+    int ponteiro = 0; // ponteiro para dados
+
+    for(int i = 0; i < n; i++)
+    {
+      int pos = i + 1;
+      // As posicoes de paridade sao as potencias de 2 (1, 2, 4, 8, ...),
+      // mas em arrays comecamos do indice 0, entao (i+1)
+      boolean potenciaDeDois = pos > 0 && (pos & (pos - 1)) == 0;
+      System.out.println(potenciaDeDois);
+      if(!potenciaDeDois)
+      {
+        if(ponteiro < m)
+        {
+          hamming[i] = quadro[ponteiro];
+          ponteiro++;
+        }
+      }
+    }
+
+    //Calcular o valor de cada bit de paridade
+    for(int i = 0; i < r; i++)
+    {
+      int paridade = (int) Math.pow(2, i);
+      int xor = 0;
+      for(int j = 0; j < n; j++)
+      {
+        int pos = j + 1;
+        // Usamos operacoes bit-a-bit 
+        if(((pos >> i) & 1) == 1)
+        {
+
+          if(pos != paridade) // Nao inclui o proprio bit de paridade no calculo
+          {
+            xor ^= hamming[j];
+          }
+        }
+      }
+      hamming[paridade - 1] = xor; // Define o bit de paridade
+    }
+    System.out.println("Pelo menos fez o controle de hamming");
+    System.out.println(Arrays.toString(hamming)); // Debug
     return hamming;
   } // Fim do metodo
 
@@ -619,7 +673,60 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] hammingVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int[] hamming = quadro;
-    return hamming;
+    int n = quadro.length; // bits de dados
+    int r = 0; //bits de paridade
+
+    // Calculo para verificar o hamming
+    while(Math.pow(2, r) < n + 1)
+    {
+      r++;
+    } // Fim do while
+
+    int error = 0; // posicao do erro
+
+    // recalcula os bits de paridade para encontrar a posicao do erro
+    for(int i = 0; i < r; i++)
+    {
+      int paridade = (int) Math.pow(2, i);
+      int xor = 0;
+      //For para o calculo 
+      for(int j = paridade - 1; j < n; j++)
+      {
+        //Se for igual a 1
+        if((((j + 1) >> i) & 1) == 1)
+        {
+          xor ^= quadro[j];
+        } //Fim do if
+      } // Fim do for
+
+      //Se o xor for diferente de 0, a posicao do erro eh o bit de paridade
+      if(xor != 0)
+      {
+        error += paridade;
+      } // Fim do if
+    } // Fim do for
+
+    //Corrigir erro, se houver
+    //Se a posicao do erro for diferente de 0
+    if(error != 0)
+    {
+      System.out.println("erro encontrado na pos:");
+      System.out.println(error);
+      return null; // Descarta o fluxo
+    } // Fim do if
+
+    // Extrair dados originais
+    ArrayList<Integer> dadosOriginais= new ArrayList<>();
+    for(int i = 0; i < n; i++)
+    {
+      // Verifica se a posicao (i+1) NAO e uma potencia de 2
+      if(!((i + 1) > 0 && ((i + 1) & (i)) == 0))
+      {
+        dadosOriginais.add(quadro[i]);
+      }
+    } // FIm do for
+
+    System.out.println(Arrays.toString(arrayListToArrayInt(dadosOriginais))); // Debug
+    return arrayListToArrayInt(dadosOriginais);
   } // Fim do metodo
 }
