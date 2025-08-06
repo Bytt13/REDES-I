@@ -242,19 +242,21 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] contagemCaracteres(int[] bits)
   {
-    int numeroBytes = bits.length / 8; // Conta quantos bytes a mensagem tem
-    String binarioDoTamanho= String.format("%8s", Integer.toBinaryString(numeroBytes)).replace(' ', '0'); // Converte o numero de bytes para um array de 8 bits
+    int numeroBits = bits.length; // Conta o numero total de BITS
+    // Converte o numero de bits para uma string binaria de 16 bits (permite mensagens de ate 65535 bits)
+    String binarioDoTamanho = String.format("%16s", Integer.toBinaryString(numeroBits)).replace(' ', '0'); 
 
-    int[] cabecalho = new int[8]; //Cria um array para conseguirmos enquadrar os bits
-    //Loop para enquadrar
-    for(int i = 0; i < 8; i++)
+    int[] cabecalho = new int[16]; // Cria um cabecalho de 16 bits
+    //Loop para preencher o cabecalho
+    for(int i = 0; i < 16; i++)
     {
       cabecalho[i] = Character.getNumericValue(binarioDoTamanho.charAt(i));
     }
 
-    int[] caracteres = new int[bits.length + 8]; // Cria o array que vai ser retornado pela funcao
-    System.arraycopy(cabecalho, 0, caracteres, 0, 8);
-    System.arraycopy(bits, 0, caracteres, 8, bits.length);
+    // Cria o array final com espaco para o cabecalho + os bits da mensagem
+    int[] caracteres = new int[bits.length + 16]; 
+    System.arraycopy(cabecalho, 0, caracteres, 0, 16); // Copia o cabecalho para o inicio
+    System.arraycopy(bits, 0, caracteres, 16, bits.length); // Copia os dados logo apos o cabecalho
 
     return caracteres; //retorna o quadro enquadrado
   } // Fim do metodo
@@ -371,8 +373,14 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] desenquadroContagemCaracteres(int[] quadroEnquadrado)
   {
-    //le os primeiros 8 bits para saber o tamanho
-    int[] cabecalho = Arrays.copyOfRange(quadroEnquadrado, 0, 8);
+    // Verifica se o quadro tem pelo menos o tamanho do cabecalho
+    if (quadroEnquadrado.length < 16) {
+        System.out.println("Erro: Quadro de contagem de caracteres invalido. Muito curto.");
+        return new int[0]; // Retorna um array vazio para indicar erro
+    }
+      
+    // Le os primeiros 16 bits para saber o tamanho em BITS
+    int[] cabecalho = Arrays.copyOfRange(quadroEnquadrado, 0, 16);
     StringBuilder binarioDoTamanho = new StringBuilder();
     // Percorre e transforma o tamanho em binario
     for(int bit : cabecalho)
@@ -380,8 +388,16 @@ public class FuncoesAuxiliares {
       binarioDoTamanho.append(bit); // Forma a string
     }
 
-    int tamanho = Integer.parseInt(binarioDoTamanho.toString(), 2); // Retorna o tamanho
-    return Arrays.copyOfRange(quadroEnquadrado, 8, 8 + (tamanho * 8)); // Retorna o quadro desenquadrado
+    int tamanhoEmBits = Integer.parseInt(binarioDoTamanho.toString(), 2); // Converte a string binaria para um inteiro
+
+    // Verifica se o resto do quadro tem o tamanho esperado
+    if (quadroEnquadrado.length < 16 + tamanhoEmBits) {
+        System.out.println("Erro: Quadro de contagem de caracteres corrompido. Tamanho esperado nao corresponde ao tamanho real.");
+        return new int[0];
+    }
+      
+    // Retorna o quadro desenquadrado, lendo exatamente 'tamanhoEmBits' a partir do final do cabecalho
+    return Arrays.copyOfRange(quadroEnquadrado, 16, 16 + tamanhoEmBits); 
   } // Fim do metodo
 
   /**************************************************************
@@ -740,61 +756,52 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] hammingVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int n = quadro.length; // bits de dados
-    int r = 0; //bits de paridade
+    int n = quadro.length; // tamanho total do quadro recebido
+    int r = 0;
 
-    // Calculo para verificar o hamming
+    // Calcula quantos bits de paridade deveriam existir
     while(Math.pow(2, r) < n + 1)
     {
       r++;
-    } // Fim do while
+    }
 
-    int error = 0; // posicao do erro
+    int posicaoErro = 0; // Armazena a posicao do erro (sindrome)
 
-    // recalcula os bits de paridade para encontrar a posicao do erro
+    // 1. Recalcula os bits de paridade para encontrar a sindrome do erro
     for(int i = 0; i < r; i++)
     {
-      int paridade = (int) Math.pow(2, i);
+      int p_pos = (int) Math.pow(2, i);
       int xor = 0;
-      //For para o calculo 
-      for(int j = paridade - 1; j < n; j++)
+      for(int j = 0; j < n; j++)
       {
-        //Se for igual a 1
-        if((((j + 1) >> i) & 1) == 1)
-        {
-          xor ^= quadro[j];
-        } //Fim do if
-      } // Fim do for
-
-      //Se o xor for diferente de 0, a posicao do erro eh o bit de paridade
-      if(xor != 0)
-      {
-        error += paridade;
-      } // Fim do if
-    } // Fim do for
-
-    //Corrigir erro, se houver
-    //Se a posicao do erro for diferente de 0
-    if(error != 0)
-    {
-      System.out.println("erro encontrado na pos:");
-      System.out.println(error);
-      return null; // Descarta o fluxo
-    } // Fim do if
-
-    // Extrair dados originais
-    ArrayList<Integer> dadosOriginais= new ArrayList<>();
-    for(int i = 0; i < n; i++)
-    {
-      int pos = i + 1;
-      // Verifica se a posicao (i+1) NAO e uma potencia de 2
-      if(!((pos > 0) && ((pos & (pos - 1)) == 0)))
-      {
-        dadosOriginais.add(quadro[i]);
+        if ((((j + 1) >> i) & 1) == 1) {
+            xor ^= quadro[j];
+        }
       }
-    } // FIm do for
+      if (xor != 0) {
+        posicaoErro += p_pos;
+      }
+    }
 
-    System.out.println(Arrays.toString(arrayListToArrayInt(dadosOriginais))); // Debug
+    // 2. Corrige o erro, se um foi encontrado
+    if (posicaoErro != 0) {
+        
+        int indiceErro = posicaoErro - 1; // Converte para indice de array (base 0)
+        if (indiceErro < n && indiceErro >= 0) {
+            quadro[indiceErro] = 1 - quadro[indiceErro]; // Inverte o bit errado
+        }
+    }
+
+    // 3. Extrai os dados originais, removendo os bits de paridade
+    ArrayList<Integer> dadosOriginais = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+        int pos = i + 1;
+        boolean isPowerOfTwo = (pos > 0) && ((pos & (pos - 1)) == 0);
+        if (!isPowerOfTwo) {
+            dadosOriginais.add(quadro[i]);
+        }
+    }
+    
     return arrayListToArrayInt(dadosOriginais);
   } // Fim do metodo
 }

@@ -25,7 +25,7 @@ public class CamadaEnlaceDadosReceptora {
   {
     String enquadramento = controller.getComboBoxEnquadramento(); // Pega o tipo de enquadramento selecionado
     int[] quadroDeBits = desenquadrar(quadroEnquadrado, enquadramento, controller); // Desenquadra os bits
-    int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
+    int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller); // REaliza a verificacao de erro
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
     if(quadroDeBitsVerificado != null)
@@ -36,7 +36,7 @@ public class CamadaEnlaceDadosReceptora {
 
       //Chama a proxima camada
       CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-      camadaAppRx.receber(quadroDeBits, controller);
+      camadaAppRx.receber(quadroDeBitsVerificado, controller);
     }
     else if(quadroDeBitsVerificado == null)
     {
