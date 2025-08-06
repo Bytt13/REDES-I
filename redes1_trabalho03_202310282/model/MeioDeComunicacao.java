@@ -14,6 +14,8 @@ import controller.TelaPrincipalController;
 //import que vamos precisar
 
 public class MeioDeComunicacao {
+
+  private Random rand = new Random(); // Cria o objeto randomico fora do metodo para gerar a chance de erro aleatoria
 /**************************************************************
 * Metodo: transferir
 * Funcao: transfere a mensagem em forma de bits codificados para a proxima camada, e aplica um erro caso ocorra
@@ -30,8 +32,6 @@ public class MeioDeComunicacao {
     try {
       String valorErro = erro.replace("%", "").trim();
       int chanceErro = Integer.parseInt(valorErro);
-      // Converte a probabilidade da GUI num valor real
-      Random rand = new Random();
 
       // Tenta simular um erro se a chance dele acontecer for maior que 0
       if(chanceErro > 0)
