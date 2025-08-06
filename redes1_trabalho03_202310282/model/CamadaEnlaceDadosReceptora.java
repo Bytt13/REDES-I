@@ -23,15 +23,13 @@ public class CamadaEnlaceDadosReceptora {
 * ********************************************************* */
   public void receber(int[] quadroEnquadrado, TelaPrincipalController controller)
   {
-    int[] quadroDeBits;
     String enquadramento = controller.getComboBoxEnquadramento(); // Pega o tipo de enquadramento selecionado
-    int[] quadroDeBitsVerificado = controleErro(quadroEnquadrado, controller);
+    int[] quadroDeBits = desenquadrar(quadroEnquadrado, enquadramento, controller); // Desenquadra os bits
+    int[] quadroDeBitsVerificado = controleErro(quadroDeBits, controller);
 
     // Chama a proxima camada e passa os bits decodificados e desenquadrados
     if(quadroDeBitsVerificado != null)
     {
-      quadroDeBits = desenquadrar(quadroDeBitsVerificado, enquadramento, controller); // Desenquadra os bits
-
       //Debug
       System.out.println("Enlace receptor - OK");
       System.out.println(Arrays.toString(quadroDeBits));

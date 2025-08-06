@@ -583,8 +583,40 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] crc(int[] quadro)
   {
-    int[] crc = quadro;
-    return crc;
+    // Polinomio Gerador para CRC-32 (IEEE 802.3) -> 0x04C11DB7
+    // Representado em bits (33 bits, o x^32 eh implicito)
+    int[] polinomioGerador = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
+
+    int tamanhoDados = quadro.length;
+    int tamanhoPolinomio = polinomioGerador.length;
+    
+    // 1. Crie uma cópia do quadro com 32 bits de zero no final.
+    // Esses zeros são o espaço onde o resto da "divisão" será calculado.
+    int[] quadroEstendido = new int[tamanhoDados + tamanhoPolinomio - 1];
+    System.arraycopy(quadro, 0, quadroEstendido, 0, tamanhoDados);
+    // Os zeros já são adicionados por padrão na criação do array em Java.
+
+    // Cria uma copia para fazer a divisao (XOR) sem alterar o original
+    int[] resto = Arrays.copyOf(quadroEstendido, quadroEstendido.length);
+
+    // 2. Realiza a "divisao" de polinômios usando XOR.
+    // Itera pelos bits do quadro original (sem os zeros adicionados).
+    for (int i = 0; i < tamanhoDados; i++) {
+        // Se o bit atual eh 1, realizamos a operacao XOR. Se for 0, pulamos.
+        if (resto[i] == 1) {
+            for (int j = 0; j < tamanhoPolinomio; j++) {
+                // XOR bit a bit entre a seção atual do resto e o polinômio
+                resto[i + j] = resto[i + j] ^ polinomioGerador[j];
+            }
+        }
+    }
+
+    // 3. O resto da divisao está agora nos ultimos 32 bits do array 'resto'.
+    // Pegamos esses bits e os colocamos no lugar dos zeros no quadro original.
+    int[] quadroComCRC = Arrays.copyOf(quadro, tamanhoDados + tamanhoPolinomio - 1);
+    System.arraycopy(resto, tamanhoDados, quadroComCRC, tamanhoDados, tamanhoPolinomio - 1);
+    
+    return quadroComCRC;
   } // Fim do metodo
 
   /**************************************************************
@@ -595,8 +627,43 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] crcVerificacao(int[] quadro, TelaPrincipalController controller)
   {
-    int[] crc = quadro;
-    return crc;
+    // Polinômio Gerador para CRC-32 (IEEE 802.3)
+    int[] polinomioGerador = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
+    
+    int tamanhoQuadro = quadro.length;
+    int tamanhoPolinomio = polinomioGerador.length;
+    int tamanhoDados = tamanhoQuadro - (tamanhoPolinomio - 1);
+
+    // Cria uma copia do quadro recebido para realizar a verificacao
+    int[] resto = Arrays.copyOf(quadro, tamanhoQuadro);
+
+    // 1. Realiza a divisao XOR no quadro inteiro recebido.
+    for (int i = 0; i < tamanhoDados; i++) {
+        if (resto[i] == 1) {
+            for (int j = 0; j < tamanhoPolinomio; j++) {
+                resto[i + j] = resto[i + j] ^ polinomioGerador[j];
+            }
+        }
+    }
+
+    // 2. Verifica se o resto da divisao eh zero.
+    boolean erroDetectado = false;
+    // O resto esta nos ultimos 32 bits do array.
+    for (int i = tamanhoDados; i < tamanhoQuadro; i++) {
+        if (resto[i] != 0) {
+            erroDetectado = true;
+            break;
+        }
+    }
+
+    // 3. Retorna o resultado.
+    if (!erroDetectado) {
+        // Se não tem erro, retorna apenas a parte dos dados do quadro.
+        return Arrays.copyOfRange(quadro, 0, tamanhoDados);
+    } else {
+        // Se um erro foi detectado, o quadro deve ser descartado.
+        return null; 
+    }
   } // Fim do metodo
   
   /**************************************************************
