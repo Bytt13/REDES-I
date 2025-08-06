@@ -408,21 +408,36 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] desenquadroInsercaoBits(int[] quadroEnquadrado)
   {
-    ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que vai armazenar o quadro de bits desenquadrado
+ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que vai armazenar o quadro de bits desenquadrado
+    int[] FLAG = {0,1,1,1,1,1,1,0}; // FLAG 
     int contadorDeUns = 0;
-    // Ignora a FLAG inicial e inicia o Loop para desenquadrar
+
+    // 1. Verifica se o quadro tem tamanho minimo e se comeca e termina com uma FLAG
+    if (quadroEnquadrado.length < 16 || 
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, 0, 8), FLAG) ||
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, quadroEnquadrado.length - 8, quadroEnquadrado.length), FLAG))
+    {
+        System.out.println("Erro de Enquadramento: FLAG de inicio/fim não encontrada ou corrompida em Insercao de Bits.");
+        return new int[0]; // Retorna quadro vazio
+    }
+
+    // Ignora a FLAG inicial e final no loop principal
     for(int i = 8; i < quadroEnquadrado.length - 8; i++)
     {
       int bit = quadroEnquadrado[i];
-      if(contadorDeUns == 5 & bit == 0)
+      if(contadorDeUns == 5 && bit == 0)
       {
-        contadorDeUns = 0; //eh um bit de stuffing, entao ignoramos
+        // eh um bit de stuffing, entao o ignoramos e resetamos o contador
+        contadorDeUns = 0; 
       }
       else
       {
         quadroSemStuffing.add(bit);
-        if(bit == 1) contadorDeUns++;
-        else contadorDeUns = 0;
+        if(bit == 1) {
+          contadorDeUns++;
+        } else {
+          contadorDeUns = 0;
+        }
       }
     }
 
@@ -438,19 +453,34 @@ public class FuncoesAuxiliares {
   public int[] desenquadroInsercaoBytes(int[] quadroEnquadrado)
   {
     ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que vai armazenar o quadro de bits desenquadrado
-    int[] FLAG = {0,1,1,1,1,1,1,0}; // FLAG reversa
-    int[] ESC = {0,1,1,1,1,1,0,1}; // ESC reverso
+    int[] FLAG = {0,1,1,1,1,1,1,0}; // FLAG 
+    int[] ESC = {0,1,1,1,1,1,0,1}; // ESC 
 
-    // Ignora a FLAG inicial e final
+    // 1. Verifica se o quadro tem tamanho minimo (pelo menos duas flags) e se comeca e termina com uma FLAG
+    if (quadroEnquadrado.length < 16 || 
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, 0, 8), FLAG) ||
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, quadroEnquadrado.length - 8, quadroEnquadrado.length), FLAG))
+    {
+        System.out.println("Erro de Enquadramento: FLAG de inicio/fim não encontrada ou corrompida em Insercao de Bytes.");
+        return new int[0]; // Retorna quadro vazio para indicar erro critico de enquadramento
+    }
+
+    // Ignora a FLAG inicial e final no loop principal
     for(int i = 8; i < quadroEnquadrado.length - 8; i += 8)
     {
-      int[] chunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8); // Cria o chunk
+      int[] chunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8);
       //verifica se o chunk é um ESC
       if(Arrays.equals(chunk, ESC))
       {
-        i += 8;
-        int[] proximoChunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8);
-        addAll(quadroSemStuffing, proximoChunk);
+        i += 8; // Pula o ESC e pega o proximo byte
+        // Verifica se ainda ha um byte para ler apos o ESC
+        if (i + 8 <= quadroEnquadrado.length - 8) {
+            int[] proximoChunk = Arrays.copyOfRange(quadroEnquadrado, i, i + 8);
+            addAll(quadroSemStuffing, proximoChunk);
+        } else {
+             // Erro de enquadramento: ESC no final do quadro sem dados a seguir
+             return new int[0];
+        }
       }
       else
       {
@@ -504,6 +534,11 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] paridadeParVerificacao(int[] quadro, TelaPrincipalController controller)
   {
+    // Confere se o quadro deu erro
+    if (quadro == null || quadro.length < 1) {
+        return null;
+    } // Fim do if
+
     int[] par = new int[quadro.length - 1];
     int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
     //Loop para contar os bits 1 do quadro original
@@ -535,29 +570,29 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] paridadeImpar(int[] quadro)
   {
-  int[] impar = new int[quadro.length + 1];
-  int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
-  //Loop para contar os bits 1 do quadro original
-  for(int bit : quadro)
-  {
-    //Se for 1, aumenta o contador
-    if(bit == 1)
+    int[] impar = new int[quadro.length + 1];
+    int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
+    //Loop para contar os bits 1 do quadro original
+    for(int bit : quadro)
     {
-      contadorDeUns++;
+      //Se for 1, aumenta o contador
+      if(bit == 1)
+      {
+        contadorDeUns++;
+      }
     }
-  }
-  System.arraycopy(quadro, 0, impar, 0, quadro.length);
+    System.arraycopy(quadro, 0, impar, 0, quadro.length);
 
-  // Se a contagem for impar ou par, muda bit de paridade
-  if(contadorDeUns % 2 != 0)
-  {
-    impar[quadro.length] = 0;
-  }
-  else
-  {
-    impar[quadro.length] = 1;
-  }
-  return impar;
+    // Se a contagem for impar ou par, muda bit de paridade
+    if(contadorDeUns % 2 != 0)
+    {
+      impar[quadro.length] = 0;
+    }
+    else
+    {
+      impar[quadro.length] = 1;
+    }
+    return impar;
   } // Fim do metodo
 
   /**************************************************************
@@ -568,6 +603,11 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] paridadeImparVerificacao(int[] quadro, TelaPrincipalController controller)
   {
+        // Confere se o quadro deu erro
+    if (quadro == null || quadro.length < 1) {
+        return null;
+    } // Fim do if
+
     int[] impar = new int[quadro.length - 1];
     int contadorDeUns = 0; // Cria um contador para verificarmos quantos 1 tem
     //Loop para contar os bits 1 do quadro original
@@ -643,6 +683,11 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] crcVerificacao(int[] quadro, TelaPrincipalController controller)
   {
+    // Confere se o quadro deu erro
+    if (quadro == null || quadro.length < 1) {
+        return null;
+    } // Fim do if
+
     // Polinômio Gerador para CRC-32 (IEEE 802.3)
     int[] polinomioGerador = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
     
@@ -756,6 +801,11 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] hammingVerificacao(int[] quadro, TelaPrincipalController controller)
   {
+    // Confere se o quadro deu erro
+    if (quadro == null || quadro.length < 1) {
+        return null;
+    } // Fim do if
+
     int n = quadro.length; // tamanho total do quadro recebido
     int r = 0;
 
