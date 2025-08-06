@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TelaPrincipalController">
+<left>
+  <VBox prefHeight="400.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+      <children>
+        <Label fx:id="labelTransmissao" prefHeight="32.0" prefWidth="303.0" text="                     Painel Transmissor">
+            <font>
+              <Font size="19.0" />
+            </font>
+        </Label>
+        <TextArea fx:id="textAreaMensagemOriginal" prefHeight="96.0" prefWidth="129.0" promptText="Digite sua mensagem...." />
+            <VBox prefHeight="77.0" prefWidth="300.0">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="comboBoxErro" prefHeight="27.0" prefWidth="302.0" promptText="Erro" />
+                        <ComboBox fx:id="comboBoxControleErro" prefHeight="27.0" prefWidth="435.0" promptText="Controle de Erro" />
+                     </children>
+                  </HBox>
+              <ComboBox fx:id="comboBoxCodificacao" prefHeight="27.0" prefWidth="302.0" promptText="Codificação" />
+                  <ComboBox fx:id="comboBoxEnquadramento" prefHeight="27.0" prefWidth="303.0" promptText="Enquadramento" />
+               </children>
+            </VBox>
+            <HBox prefHeight="0.0" prefWidth="300.0" />
+        <Button fx:id="buttonSimular" mnemonicParsing="false" onAction="#botao" prefHeight="35.0" prefWidth="300.0" text="Simular Transmissão">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Button>
+        <Label fx:id="labelMensagemBits" prefHeight="45.0" prefWidth="299.0" text="Mensagem em bits (enquadrados)">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Label>
+        <TextField fx:id="textFieldBits" editable="false" prefHeight="54.0" prefWidth="300.0">
+               <font>
+                  <Font size="10.0" />
+               </font></TextField>
+        <Label fx:id="labelCodificada" prefHeight="37.0" prefWidth="301.0" text="Mensagem Codificada">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Label>
+        <TextField fx:id="textFieldCodificada" editable="false" layoutX="10.0" layoutY="261.0" prefHeight="54.0" prefWidth="300.0">
+               <font>
+                  <Font size="10.0" />
+               </font></TextField>
+      </children>
+  </VBox>
+</left>
+<right>
+  <VBox prefHeight="400.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+      <children>
+        <Label fx:id="labelReceptor" prefHeight="34.0" prefWidth="322.0" text="                      Painel Receptor">
+            <font>
+              <Font size="19.0" />
+            </font>
+        </Label>
+        <Label fx:id="labelSinal" prefHeight="35.0" prefWidth="304.0" text="Sinal Recebido">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Label>
+        <TextField fx:id="textFieldSinal" editable="false" prefHeight="53.0" prefWidth="300.0">
+               <font>
+                  <Font size="10.0" />
+               </font></TextField>
+        <Label fx:id="labelDecodificada" prefHeight="40.0" prefWidth="302.0" text="Mensagem Decodificada">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Label>
+        <TextField fx:id="textFieldDecodificada" editable="false" prefHeight="51.0" prefWidth="280.0">
+               <font>
+                  <Font size="10.0" />
+               </font></TextField>
+        <Label fx:id="labelMensagemFinal" prefHeight="42.0" prefWidth="300.0" text="Sua Mensagem">
+            <font>
+              <Font size="21.0" />
+            </font>
+        </Label>
+        <TextArea fx:id="textAreaMensagemFinal" editable="false" prefHeight="133.0" prefWidth="300.0">
+               <font>
+                  <Font size="14.0" />
+               </font></TextArea>
+      </children>
+  </VBox>
+</right>
+</BorderPane>
