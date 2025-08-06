@@ -15,7 +15,6 @@ import controller.TelaPrincipalController;
 
 public class MeioDeComunicacao {
 
-  private Random rand = new Random(); // Cria o objeto randomico fora do metodo para gerar a chance de erro aleatoria
 /**************************************************************
 * Metodo: transferir
 * Funcao: transfere a mensagem em forma de bits codificados para a proxima camada, e aplica um erro caso ocorra
@@ -28,33 +27,35 @@ public class MeioDeComunicacao {
   public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, String erro, TelaPrincipalController controller)
   { 
     int[] fluxoBrutoDeBitsPontoB = new int[fluxoBrutoDeBitsPontoA.length];
+    // Gera um numero aleatorio entre 0 e 99
+    Random rand = new Random();
+    int numeroSorteado = rand.nextInt(100); 
     // Simula o erro com probabilidade definida pela GUI
     try {
       String valorErro = erro.replace("%", "").trim();
       int chanceErro = Integer.parseInt(valorErro);
-
+      
       // Tenta simular um erro se a chance dele acontecer for maior que 0
       if(chanceErro > 0)
       {
         for(int i = 0; i < fluxoBrutoDeBitsPontoA.length; i++)
         {
-          int numeroSorteado = rand.nextInt(100);
+          
+          // Compara com a chance de erro. Agora a probabilidade sera respeitada para cada bit.
           if(numeroSorteado < chanceErro)
           {
-            fluxoBrutoDeBitsPontoB[i] = 1 - fluxoBrutoDeBitsPontoA[i];
+            fluxoBrutoDeBitsPontoB[i] = 1 - fluxoBrutoDeBitsPontoA[i]; // Inverte o bit
           }
           else
           {
-            fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i];
+            fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i]; // Mantem o bit
           }
         }
       }
       else
       {
-        for(int i = 0; i < fluxoBrutoDeBitsPontoA.length; i++)
-        {
-          fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i];
-        }
+        // Se a chance de erro eh 0%, apenas copia o array original.
+        fluxoBrutoDeBitsPontoB = Arrays.copyOf(fluxoBrutoDeBitsPontoA, fluxoBrutoDeBitsPontoA.length);
       }
     } catch(NumberFormatException e) // Caso haja alguma excecao
     {
