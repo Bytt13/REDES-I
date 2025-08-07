@@ -191,7 +191,7 @@ public class TelaPrincipalController {
     Platform.runLater(() -> {
       Alert alert = new Alert(AlertType.ERROR);
       alert.setTitle("ERRO!!");
-      alert.setHeaderText("Um erro foi detectado e descartado");
+      alert.setHeaderText("Um erro foi detectado");
       alert.setContentText(mensagem);
 
       alert.showAndWait();

@@ -43,7 +43,7 @@ public class CamadaEnlaceDadosReceptora {
     else if(quadroDeBitsVerificado == null)
     {
       controller.setTextAreaMensagemFinal("");
-      controller.emitirErro("Um erro foi detectado e descartado com sucesso");
+      controller.emitirErro("Um erro foi detectado, mas a mensagem foi reenviada com sucesso");
       System.out.println("Deu null");
     }
 

@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class CamadaEnlaceDadosTransmissora {
   FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria um objeto da nossa classe auxiliar para termos rapidez no codigo
   public static final Semaphore acknack = new Semaphore(0); // Cria o semaforo para o ACK NACK
-  private final ScheduledExecutorService temporizador = Executors.newScheduledThreadPool(1); // Cria o temporizador
-  private ScheduledFuture<?> futureTimeout; // Cancelar alarme
   private static final int TIMEOUT_SEGUNDOS = 5; // Tempo do temporizador
   private TelaPrincipalController controller;
   /**************************************************************
@@ -37,26 +35,33 @@ public class CamadaEnlaceDadosTransmissora {
   * ********************************************************* */
  public void transmitir(int[] bits, String codificacao, String enquadramento, TelaPrincipalController controller)
  {  
-  this.controller = controller;
-  String fluxo = this.controller.getComboBoxControleFluxo();
-  int[] quadroControlado = controleFluxo(bits, codificacao, enquadramento, fluxo);
-  // Chama a proxima caamda para realizar a codificacao e continuar a transmissaoß
-  CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
-  fisicaTx.transmitir(quadroControlado, codificacao, this.controller);
-  // inicia a logica try catch do temporizador
-  try {
-    futureTimeout = temporizador.schedule(() -> {
-      System.out.println("TEMPORIZADOR: TIMEOUT! O ACK não chegou a tempo. Reenviando quadro...");
-      transmitir(quadroControlado, codificacao, enquadramento, controller);
-    },TIMEOUT_SEGUNDOS, TimeUnit.SECONDS);
+    this.controller = controller;
+    String fluxo = this.controller.getComboBoxControleFluxo();
+    int[] quadroControlado = controleFluxo(bits, codificacao, enquadramento, fluxo);
+    CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
 
-    System.out.println("ACK recebido!");
-    acknack.acquire();
-    futureTimeout.cancel(true);
-  } catch(InterruptedException e) {
-    futureTimeout.cancel(true);
-    Thread.currentThread().interrupt();
-  }
+    // Loop para continuar enviando ate que um ACK seja recebido
+    while (true) {
+        System.out.println("Enviando quadro para a camada física...");
+        fisicaTx.transmitir(quadroControlado, codificacao, this.controller);
+
+        try {
+            // Tenta adquirir o semaforo (esperar pelo ACK) com um timeout.
+            // Retorna 'true' se conseguir o ACK, 'false' se o tempo estourar.
+            if (acknack.tryAcquire(TIMEOUT_SEGUNDOS, TimeUnit.SECONDS)) {
+                System.out.println("ACK recebido! Transmissão do quadro bem-sucedida.");
+                break; // Se o ACK foi recebido, sai do loop e termina a transmissao.
+            } else {
+                // Se tryAcquire retornou 'false', o timeout ocorreu.
+                System.out.println("TEMPORIZADOR: TIMEOUT! O ACK não chegou a tempo. Reenviando quadro...");
+                // O loop continuará e o quadro será reenviado.
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread de transmissão interrompida.");
+            break; // Sai do loop se a thread for interrompida.
+        }
+    }
  }
    /**************************************************************
   * Metodo: enquadramento
