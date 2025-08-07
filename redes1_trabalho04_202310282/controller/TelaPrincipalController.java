@@ -74,8 +74,8 @@ public class TelaPrincipalController {
     comboBoxErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
     comboBoxControleErro.getItems().addAll("Paridade Par", "Paridade Impar", "CRC", "Código de Hamming"); //adiciona os elementos ao combo box
     comboBoxControleErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
-    comboBoxControleErro.getItems().addAll("Deslizante 1 bit", "Deslizante Go-Back-N", "Retransmissão Seletiva"); //adiciona os elementos ao combo box
-    comboBoxControleErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
+    comboBoxFluxo.getItems().addAll("Deslizante 1 bit", "Deslizante Go-Back-N", "Retransmissão Seletiva"); //adiciona os elementos ao combo box
+    comboBoxFluxo.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
   } // Fim do metodo
   /**************************************************************
   * Metodo: botao

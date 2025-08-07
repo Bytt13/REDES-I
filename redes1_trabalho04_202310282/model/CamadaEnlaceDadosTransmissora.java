@@ -15,8 +15,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
-//imports que vamos precisar
 import java.util.concurrent.TimeUnit;
+//imports que vamos precisar
+
 
 public class CamadaEnlaceDadosTransmissora {
   FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria um objeto da nossa classe auxiliar para termos rapidez no codigo
@@ -24,6 +25,7 @@ public class CamadaEnlaceDadosTransmissora {
   private final ScheduledExecutorService temporizador = Executors.newScheduledThreadPool(1); // Cria o temporizador
   private ScheduledFuture<?> futureTimeout; // Cancelar alarme
   private static final int TIMEOUT_SEGUNDOS = 5; // Tempo do temporizador
+  private TelaPrincipalController controller;
   /**************************************************************
   * Metodo: transmitir
   * Funcao: envia a mensagem em bits para a proxima camada
@@ -35,11 +37,12 @@ public class CamadaEnlaceDadosTransmissora {
   * ********************************************************* */
  public void transmitir(int[] bits, String codificacao, String enquadramento, TelaPrincipalController controller)
  {  
-  String fluxo = controller.getComboBoxControleFluxo();
+  this.controller = controller;
+  String fluxo = this.controller.getComboBoxControleFluxo();
   int[] quadroControlado = controleFluxo(bits, codificacao, enquadramento, fluxo);
   // Chama a proxima caamda para realizar a codificacao e continuar a transmissaoß
   CamadaFisicaTransmissora fisicaTx = new CamadaFisicaTransmissora();
-  fisicaTx.transmitir(quadroControlado, codificacao, controller);
+  fisicaTx.transmitir(quadroControlado, codificacao, this.controller);
   // inicia a logica try catch do temporizador
   try {
     futureTimeout = temporizador.schedule(() -> {
@@ -140,6 +143,7 @@ private int[] controleFluxo(int[] bits, String codificacao, String enquadramento
   {
     case "Deslizante 1 bit":
       quadroControlado = protocoloUmBit(bits, codificacao, enquadramento);
+      break;
     default: 
       quadroControlado = protocoloUmBit(bits, codificacao, enquadramento);
   }
@@ -157,7 +161,6 @@ private int[] controleFluxo(int[] bits, String codificacao, String enquadramento
 * ********************************************************* */
 private int[] protocoloUmBit(int[] bits, String codificacao, String enquadramento)
 {
-  TelaPrincipalController controller = new TelaPrincipalController(); // Declara o controller para controlarmos a cena
   int[] quadroLimpo = controleErro(bits, controller); // aplica o controle de erro ao quadro de bits
   int[] quadroEnquadrado = enquadramento(quadroLimpo, enquadramento); // enquadra os bits
   int[] protocoloUmBit = quadroEnquadrado; //copia os bits enquadrados para enviar para proxima camada
