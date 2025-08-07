@@ -193,7 +193,6 @@ public class TelaPrincipalController {
       alert.setTitle("ERRO!!");
       alert.setHeaderText("Um erro foi detectado");
       alert.setContentText(mensagem);
-
       alert.showAndWait();
     });
   } // Fim do metodo

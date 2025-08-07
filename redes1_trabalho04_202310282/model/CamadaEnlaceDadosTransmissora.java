@@ -43,6 +43,7 @@ public class CamadaEnlaceDadosTransmissora {
     // Loop para continuar enviando ate que um ACK seja recebido
     while (true) {
         System.out.println("Enviando quadro para a camada física...");
+        controller.setTextFieldBits(auxiliar.arrayToString(quadroControlado));
         fisicaTx.transmitir(quadroControlado, codificacao, this.controller);
 
         try {
