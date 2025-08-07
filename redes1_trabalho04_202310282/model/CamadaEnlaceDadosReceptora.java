@@ -37,6 +37,8 @@ public class CamadaEnlaceDadosReceptora {
       //Chama a proxima camada
       CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
       camadaAppRx.receber(quadroDeBitsVerificado, controller);
+
+      CamadaEnlaceDadosTransmissora.acknack.release();
     }
     else if(quadroDeBitsVerificado == null)
     {

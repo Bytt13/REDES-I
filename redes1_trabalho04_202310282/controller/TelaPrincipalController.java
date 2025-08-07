@@ -46,13 +46,16 @@ public class TelaPrincipalController {
   private ComboBox<String> comboBoxCodificacao; //Declaro a caixa de selecao para o usuario escolher entre os 3 metodos
 
   @FXML
-  private ComboBox<String> comboBoxEnquadramento; //Declaro a caixa de selecao para o usuario escolher entre os 3 metodos
+  private ComboBox<String> comboBoxEnquadramento; //Declaro a caixa de selecao para o usuario escolher entre os 4 metodos
 
   @FXML
   private ComboBox<String> comboBoxErro; //Declaro a caixa de selecao para o usuario escolher entre os 3 metodos
 
   @FXML
-  private ComboBox<String> comboBoxControleErro; //Declaro a caixa de selecao para o usuario escolher entre os 3 metodos
+  private ComboBox<String> comboBoxControleErro; //Declaro a caixa de selecao para o usuario escolher entre os 4 metodos
+
+  @FXML
+  private ComboBox<String> comboBoxFluxo; // Declara a caixa de selecao para o usuario escolher entre os 3 metodos
 
   /****************************************************************
   * Metodo: initialize
@@ -65,12 +68,14 @@ public class TelaPrincipalController {
   {
     comboBoxCodificacao.getItems().addAll("Binario", "Manchester", "Manchester Diferencial"); //adiciona os elementos ao combo box
     comboBoxCodificacao.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
-    comboBoxEnquadramento.getItems().addAll(    "Contagem de Caracteres", "Inserção de Bytes", "Inserção de Bits", "Violação da Camada Física");
-    comboBoxEnquadramento.getSelectionModel().selectFirst();
-    comboBoxErro.getItems().addAll("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%");
-    comboBoxErro.getSelectionModel().selectFirst();
-    comboBoxControleErro.getItems().addAll("Paridade Par", "Paridade Impar", "CRC", "Código de Hamming");
-    comboBoxControleErro.getSelectionModel().selectFirst();
+    comboBoxEnquadramento.getItems().addAll("Contagem de Caracteres", "Inserção de Bytes", "Inserção de Bits", "Violação da Camada Física"); //adiciona os elementos ao combo box
+    comboBoxEnquadramento.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
+    comboBoxErro.getItems().addAll("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"); //adiciona os elementos ao combo box
+    comboBoxErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
+    comboBoxControleErro.getItems().addAll("Paridade Par", "Paridade Impar", "CRC", "Código de Hamming"); //adiciona os elementos ao combo box
+    comboBoxControleErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
+    comboBoxControleErro.getItems().addAll("Deslizante 1 bit", "Deslizante Go-Back-N", "Retransmissão Seletiva"); //adiciona os elementos ao combo box
+    comboBoxControleErro.getSelectionModel().selectFirst(); // Deixa o primeiro item já selecionado
   } // Fim do metodo
   /**************************************************************
   * Metodo: botao
@@ -202,4 +207,15 @@ public class TelaPrincipalController {
   {
     return comboBoxControleErro.getValue();
   } // Fim do metodo
+
+/****************************************************************
+* Metodo: getComboBoxControleFluxo
+* Funcao: retorna o tipo de controle de fluxo
+* @param void
+* @return String | texto da comboBox
+* ********************************************************* */
+public String getComboBoxControleFluxo()
+{
+  return comboBoxFluxo.getValue();
+} // Fim do metodo
 }

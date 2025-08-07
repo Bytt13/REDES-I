@@ -19,8 +19,8 @@
               <Font size="19.0" />
             </font>
         </Label>
-        <TextArea fx:id="textAreaMensagemOriginal" prefHeight="96.0" prefWidth="129.0" promptText="Digite sua mensagem...." />
-            <VBox prefHeight="77.0" prefWidth="300.0">
+        <TextArea fx:id="textAreaMensagemOriginal" prefHeight="46.0" prefWidth="300.0" promptText="Digite sua mensagem...." />
+            <VBox prefHeight="76.0" prefWidth="300.0">
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
@@ -29,11 +29,12 @@
                      </children>
                   </HBox>
               <ComboBox fx:id="comboBoxCodificacao" prefHeight="27.0" prefWidth="302.0" promptText="Codificação" />
-                  <ComboBox fx:id="comboBoxEnquadramento" prefHeight="27.0" prefWidth="303.0" promptText="Enquadramento" />
+                  <ComboBox fx:id="comboBoxEnquadramento" prefHeight="80.0" prefWidth="300.0" promptText="Enquadramento" />
+                  <ComboBox fx:id="comboBoxFluxo" prefHeight="27.0" prefWidth="308.0" promptText="Controle de Fluxo" />
                </children>
             </VBox>
             <HBox prefHeight="0.0" prefWidth="300.0" />
-        <Button fx:id="buttonSimular" mnemonicParsing="false" onAction="#botao" prefHeight="35.0" prefWidth="300.0" text="Simular Transmissão">
+        <Button fx:id="buttonSimular" mnemonicParsing="false" onAction="#botao" prefHeight="3.0" prefWidth="300.0" text="Simular Transmissão">
             <font>
               <Font size="21.0" />
             </font>
