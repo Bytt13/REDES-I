@@ -162,6 +162,16 @@ public class TelaPrincipalController {
   {
     textAreaMensagemFinal.appendText(texto);
   } // Fim do metodo
+    /****************************************************************
+  * Metodo: getComboBoxCodificacao
+  * Funcao: retorna o tipo de enquadramento
+  * @param void
+  * @return String | texto da comboBox
+  * ********************************************************* */
+    public String getComboBoxCodificacao()
+  {
+    return comboBoxCodificacao.getValue();
+  } // Fim do metodo
   /****************************************************************
   * Metodo: getComboBoxEnquadramento
   * Funcao: retorna o tipo de enquadramento

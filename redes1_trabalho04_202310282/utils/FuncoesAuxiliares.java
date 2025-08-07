@@ -854,4 +854,49 @@ ArrayList<Integer> quadroSemStuffing = new ArrayList<>(); // Declara o array que
     
     return arrayListToArrayInt(dadosOriginais);
   } // Fim do metodo
+
+/**************************************************************
+* Metodo: adicionarNumeroDeSequencia
+* Funcao: Adiciona um numero de sequencia de 8 bits no início de um quadro.
+* @param int[] quadro | O quadro de dados.
+* @param int numeroSequencia | O número a ser adicionado.
+* @return int[] quadroComSequencia | O quadro com o número de sequência.
+* ********************************************************* */
+public int[] adicionarNumeroDeSequencia(int[] quadro, int numeroSequencia) {
+    String binarioSequencia = String.format("%8s", Integer.toBinaryString(numeroSequencia)).replace(' ', '0');
+    int[] quadroComSequencia = new int[quadro.length + 8];
+
+    for (int i = 0; i < 8; i++) {
+        quadroComSequencia[i] = Character.getNumericValue(binarioSequencia.charAt(i));
+    }
+    System.arraycopy(quadro, 0, quadroComSequencia, 8, quadro.length);
+    return quadroComSequencia;
+}
+
+/**************************************************************
+* Metodo: extrairNumeroDeSequencia
+* Funcao: Extrai o numero de sequencia de 8 bits do inicio de um quadro.
+* @param int[] quadroComSequencia | O quadro com a sequencia.
+* @return int numeroSequencia | O numero de sequencia extraido.
+* ********************************************************* */
+public int extrairNumeroDeSequencia(int[] quadroComSequencia) {
+    if (quadroComSequencia.length < 8) return -1; // Erro
+
+    StringBuilder binarioSequencia = new StringBuilder();
+    for (int i = 0; i < 8; i++) {
+        binarioSequencia.append(quadroComSequencia[i]);
+    }
+    return Integer.parseInt(binarioSequencia.toString(), 2);
+}
+
+/**************************************************************
+* Metodo: extrairDados
+* Funcao: Extrai os dados de um quadro, removendo o numero de sequencia.
+* @param int[] quadroComSequencia | O quadro completo.
+* @return int[] | Apenas os dados do quadro.
+* ********************************************************* */
+public int[] extrairDados(int[] quadroComSequencia) {
+    if (quadroComSequencia.length < 8) return new int[0];
+    return Arrays.copyOfRange(quadroComSequencia, 8, quadroComSequencia.length);
+}
 }
