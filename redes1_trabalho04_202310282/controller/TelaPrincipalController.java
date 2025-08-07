@@ -1,8 +1,8 @@
-/***************************************************************** 
+/*****************************************************************
 * Autor............: Lucas de Menezes Chaves
 * Matricula........: 202310282
-* Inicio...........: 
-* Ultima alteracao.: 
+* Inicio...........:
+* Ultima alteracao.:
 * Nome.............: TelaPrincipalController
 * Funcao...........: Faz a mediacao entre codigo e GUI, controlando o que deve ser feito quando acontecer alguma acao na interface
 *************************************************************** */
@@ -61,7 +61,7 @@ public class TelaPrincipalController {
   * Metodo: initialize
   * Funcao: carrega os elementos fxml para tela
   * @param void
-  * @return void 
+  * @return void
   * ********************************************************* */
   @FXML
   public void initialize()
@@ -81,7 +81,7 @@ public class TelaPrincipalController {
   * Metodo: botao
   * Funcao: faz o botao iniciar a simulacao
   * @param void
-  * @return void 
+  * @return void
   * ********************************************************* */
   @FXML
   private void botao()
@@ -95,6 +95,8 @@ public class TelaPrincipalController {
       // Verifica se a mensagem esta vazia, se estiver para o metodo
       return; //fim do metodo
     }
+    textAreaMensagemFinal.clear();
+
     // Chamada da camada de aplicacao transmissora
     AplicacaoTransmissora appTx = new AplicacaoTransmissora();
     appTx.enviarMensagem(mensagem, codificacao, this);
@@ -104,7 +106,7 @@ public class TelaPrincipalController {
   * Metodo: setTextFieldBits
   * Funcao: muda o texto do text field da mensagem em bits
   * @param String texto | o texto que vai aparecer na caixa de texto
-  * @return void 
+  * @return void
   * ********************************************************* */
   public void setTextFieldBits(String texto)
   {
@@ -114,7 +116,7 @@ public class TelaPrincipalController {
   * Metodo: setTextFieldCodificada
   * Funcao: muda o texto do text field da mensagem em bits codificada
   * @param String texto | o texto que vai aparecer na caixa de texto
-  * @return void 
+  * @return void
   * ********************************************************* */
   public void setTextFieldCodificada(String texto)
   {
@@ -124,7 +126,7 @@ public class TelaPrincipalController {
   * Metodo: setTextFieldSinal
   * Funcao: muda o texto do text field do sinal recebido
   * @param String texto | o texto que vai aparecer na caixa de texto
-  * @return void 
+  * @return void
   * ********************************************************* */
   public void setTextFieldSinal(String texto)
   {
@@ -144,7 +146,7 @@ public class TelaPrincipalController {
   * Metodo: setTextFieldDecodificada
   * Funcao: muda o texto do text field da mensagem em bits decodificada
   * @param String texto | o texto que vai aparecer na caixa de texto
-  * @return void 
+  * @return void
   * ********************************************************* */
   public void setTextFieldDecodificada(String texto)
   {
@@ -152,13 +154,13 @@ public class TelaPrincipalController {
   } // Fim do metodo
     /****************************************************************
   * Metodo: setTextAreaMensagemFinal
-  * Funcao: muda o texto do text area da mensagem final
+  * Funcao: Anexa o texto recebido ao text area da mensagem final
   * @param String texto | o texto que vai aparecer na caixa de texto
-  * @return void 
+  * @return void
   * ********************************************************* */
   public void setTextAreaMensagemFinal(String texto)
   {
-    textAreaMensagemFinal.setText(texto);
+    textAreaMensagemFinal.appendText(texto);
   } // Fim do metodo
   /****************************************************************
   * Metodo: getComboBoxEnquadramento
