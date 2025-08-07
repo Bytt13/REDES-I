@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 public class CamadaEnlaceDadosReceptora {
   FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria objeto de funcoes auxiliares para termos rapidez na hora de programar
+  Boolean errorOccured = false;
 /**************************************************************
 * Metodo: receber
 * Funcao: recebe os bits e passa eles para camada seguinte já desenquadrados
@@ -33,7 +34,10 @@ public class CamadaEnlaceDadosReceptora {
       //Debug
       System.out.println("Enlace receptor - OK");
       System.out.println(Arrays.toString(quadroDeBits));
-
+      if(errorOccured == true)
+      {
+        controller.emitirErro("Um erro foi detectado, mas a mensagem foi reenviada com sucesso");
+      }
       //Chama a proxima camada
       CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
       camadaAppRx.receber(quadroDeBitsVerificado, controller);
@@ -43,7 +47,7 @@ public class CamadaEnlaceDadosReceptora {
     else if(quadroDeBitsVerificado == null)
     {
       controller.setTextAreaMensagemFinal("");
-      controller.emitirErro("Um erro foi detectado, mas a mensagem foi reenviada com sucesso");
+      errorOccured = true;
       System.out.println("Deu null");
     }
 
