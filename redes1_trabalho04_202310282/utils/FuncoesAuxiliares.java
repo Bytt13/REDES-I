@@ -313,11 +313,29 @@ public class FuncoesAuxiliares {
   * ********************************************************* */
   public int[] desenquadroViolacaoFisica(int[] quadroEnquadrado)
   {
-    if (isQuadroAck(quadroEnquadrado)) return quadroEnquadrado; // ACKs nao sao desenquadrados
-    if(quadroEnquadrado.length >= 2 && quadroEnquadrado[0] == 2 && quadroEnquadrado[quadroEnquadrado.length - 1] == 3) {
-      return Arrays.copyOfRange(quadroEnquadrado, 1, quadroEnquadrado.length - 1);
+    if (isQuadroAck(quadroEnquadrado)) return quadroEnquadrado;
+
+    if (quadroEnquadrado == null || quadroEnquadrado.length < 2) {
+        return null; // Quadro invalido, muito curto
     }
-    return quadroEnquadrado;
+
+    // Verifica se o quadro tem os marcadores de inicio e fim corretos.
+    if (quadroEnquadrado[0] != 2 || quadroEnquadrado[quadroEnquadrado.length - 1] != 3) {
+        return null; // Quadro corrompido, marcadores ausentes ou errados.
+    }
+
+    // **INICIO DA CORRECAO**
+    // Agora, vamos verificar se ha marcadores '2' ou '3' *dentro* do quadro,
+    // o que indicaria corrupcao dos dados.
+    for (int i = 1; i < quadroEnquadrado.length - 1; i++) {
+        if (quadroEnquadrado[i] == 2 || quadroEnquadrado[i] == 3) {
+            return null; // Encontrou violacao no meio do quadro. Corrompido!
+        }
+    }
+    // **FIM DA CORRECAO**
+
+    // Se passou em todas as verificacoes, o quadro e valido. Extrai os dados.
+    return Arrays.copyOfRange(quadroEnquadrado, 1, quadroEnquadrado.length - 1);
   }
 
   /**************************************************************

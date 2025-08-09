@@ -8,6 +8,7 @@ Autor..............: Lucas de Menezes Chaves
 *************************************************************** */
 package model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import controller.TelaPrincipalController;
@@ -43,6 +44,13 @@ public class CamadaFisicaReceptora {
         fluxoDeBits = auxiliar.decodificacaoBinaria(bits);
         break;
     } // Fim do Switch
+    
+    // if para sanitizar o manchester e manchester diferencial para controle de fluxo de retransmissao seletiva
+    //String enquadramento = controller.getComboBoxEnquadramento();
+    /*if (("Manchester".equals(codificacao) || "Manchester Diferencial".equals(codificacao))
+        && !"Violação da Camada Física".equals(enquadramento)) {
+      fluxoDeBits = sanitizarFluxo(fluxoDeBits);
+    }*/
 
     String sequenciaDeBits = auxiliar.arrayToString(fluxoDeBits); // Transforma os bits em uma string para ser mostrada na GUI
     controller.setTextFieldDecodificada(sequenciaDeBits); // Mostra os bits na GUI
@@ -52,4 +60,28 @@ public class CamadaFisicaReceptora {
     CamadaEnlaceDadosReceptora enlaceRx = new CamadaEnlaceDadosReceptora();
     enlaceRx.receber(fluxoDeBits, controller);
   } // Fim do Metodo
+
+  /**************************************************************
+    * Metodo: sanitizarFluxo
+    * Funcao: Remove todos os valores que não sejam 0 ou 1 do fluxo de bits.
+    * @param int[] fluxo | O fluxo de bits decodificado.
+    * @return int[] | O fluxo de bits contendo apenas 0s e 1s.
+    * ********************************************************* */
+    /*private int[] sanitizarFluxo(int[] fluxo) {
+        if (fluxo == null) return new int[0];
+        
+        ArrayList<Integer> bitsLimpados = new ArrayList<>();
+        for (int bit : fluxo) {
+            if (bit == 0 || bit == 1) {
+                bitsLimpados.add(bit);
+            }
+        }
+        
+        // Converte o ArrayList de volta para um array de int
+        int[] resultado = new int[bitsLimpados.size()];
+        for (int i = 0; i < bitsLimpados.size(); i++) {
+            resultado[i] = bitsLimpados.get(i);
+        }
+        return resultado;
+    } // FIm do metodo*/
 } // Fim da classe

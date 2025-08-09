@@ -29,19 +29,20 @@ public class CamadaEnlaceDadosReceptora {
 * ********************************************************* */
 public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) {
   String enquadramento = controller.getComboBoxEnquadramento();
+  String codificacao = controller.getComboBoxCodificacao();
   String fluxo = controller.getComboBoxControleFluxo();
+  String finalEnquadramento = enquadramento;
+  if ("Manchester".equals(codificacao) || "Manchester Diferencial".equals(codificacao)) {
+      finalEnquadramento = "Violação da Camada Física";
+  }
 
   if (auxiliar.isQuadroAck(quadroEnquadrado)) return;
 
-  int[] quadroDesenquadrado = desenquadrar(quadroEnquadrado, enquadramento, controller);
+  int[] quadroDesenquadrado = desenquadrar(quadroEnquadrado, finalEnquadramento, controller);
   int[] quadroVerificado = controleErro(quadroDesenquadrado, controller);
 
   if (quadroVerificado != null && quadroVerificado.length > 0) 
   {
-    if(errorOccured == true)
-    {
-      controller.emitirErro("Um erro ocorreu, mas foi devidamente tratado");
-    }
       int numeroSequencia = auxiliar.extrairNumeroDeSequencia(quadroVerificado);
 
     //Escolhe o tipo de controle de fluxo
@@ -87,6 +88,7 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
   } else {
       System.out.println("RECEPTOR: Erro detectado no quadro. Descartando.");
       errorOccured = true;
+      controller.emitirErro("Um erro ocorreu, mas foi devidamente tratado");
       System.out.println(errorOccured);
   }
   } // FIm do metodo
@@ -116,6 +118,7 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
 * ********************************************************* */
   public static void reset() {
     proximoNumEsperado = 0;
+    bufferRecepcao.clear();
   }
 
 /**************************************************************

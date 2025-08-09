@@ -112,7 +112,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldBits(String texto)
   {
-    textFieldBits.setText(texto);
+    Platform.runLater(() -> textFieldBits.setText(texto));
   } // Fim do metodo
   /****************************************************************
   * Metodo: setTextFieldCodificada
@@ -122,7 +122,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldCodificada(String texto)
   {
-    textFieldCodificada.setText(texto);
+    Platform.runLater(() -> textFieldCodificada.setText(texto));
   } // Fim do metodo
   /****************************************************************
   * Metodo: setTextFieldSinal
@@ -132,7 +132,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldSinal(String texto)
   {
-    textFieldSinal.setText(texto);
+    Platform.runLater(() -> textFieldSinal.setText(texto));
   } // Fim do metodo
   /****************************************************************
   * Metodo: getTextFieldCodificada
@@ -152,7 +152,7 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextFieldDecodificada(String texto)
   {
-    textFieldDecodificada.setText(texto);
+    Platform.runLater(() -> textFieldDecodificada.setText(texto));
   } // Fim do metodo
     /****************************************************************
   * Metodo: setTextAreaMensagemFinal
@@ -162,7 +162,9 @@ public class TelaPrincipalController {
   * ********************************************************* */
   public void setTextAreaMensagemFinal(String texto)
   {
-    textAreaMensagemFinal.appendText(texto);
+    Platform.runLater(() -> {
+      textAreaMensagemFinal.appendText(texto);
+    });
   } // Fim do metodo
     /****************************************************************
   * Metodo: getComboBoxCodificacao

@@ -216,27 +216,27 @@ public class CamadaEnlaceDadosTransmissora {
 
         // Espera por um ACK. O semaforo aqui serve apenas para pausar a thread.
         try {
-            if (ackSemaphore.tryAcquire(TIMEOUT_SEGUNDOS, TimeUnit.SECONDS)) {
-                int ackNum = ultimoAckRecebido.get();
-                if (!acksRecebidos.contains(ackNum)) {
-                    acksRecebidos.add(ackNum);
-                }
-
-                // Para o temporizador do quadro que foi confirmado
-                pararTemporizador(ackNum);
-
-                // Se o ACK recebido for o da base da janela, desliza a janela
-                if (ackNum == base) {
-                    while (acksRecebidos.contains(base)) {
-                        acksRecebidos.remove(Integer.valueOf(base));
-                        quadrosEnviados.remove(base);
-                        base++;
-                    }
-                }
+          if (ackSemaphore.tryAcquire(TIMEOUT_SEGUNDOS, TimeUnit.SECONDS)) 
+          {
+            int ackNum = ultimoAckRecebido.get();
+            if (!acksRecebidos.contains(ackNum)) 
+            {
+                acksRecebidos.add(ackNum);
             }
+
+            // Para o temporizador do quadro que foi confirmado
+            pararTemporizador(ackNum);
+
+            while (acksRecebidos.contains(base)) 
+            {
+              acksRecebidos.remove(Integer.valueOf(base));
+              quadrosEnviados.remove(base);
+              base++;
+            }
+          }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            break;
+          Thread.currentThread().interrupt();
+          break;
         }
     }
 }
