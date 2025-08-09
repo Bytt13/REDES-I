@@ -18,6 +18,7 @@ public class CamadaEnlaceDadosReceptora {
   private static int proximoNumEsperado = 0; // Variavel estatica para rastrear a sequencia esperada
   private static Map<Integer, int[]> bufferRecepcao = new HashMap<>(); // Buffer para retransmissao seletiva
   private static final int TAMANHO_JANELA_RS = 4; // tamanho da janela da retransmissao seletiva
+  private boolean errorOccured = false; // Variavel para ser uma flag de erros
 
 /**************************************************************
 * Metodo: receber
@@ -27,55 +28,68 @@ public class CamadaEnlaceDadosReceptora {
 * @return void
 * ********************************************************* */
 public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) {
-    String enquadramento = controller.getComboBoxEnquadramento();
-    String fluxo = controller.getComboBoxControleFluxo();
+  String enquadramento = controller.getComboBoxEnquadramento();
+  String fluxo = controller.getComboBoxControleFluxo();
 
-    if (auxiliar.isQuadroAck(quadroEnquadrado)) return;
+  if (auxiliar.isQuadroAck(quadroEnquadrado)) return;
 
-    int[] quadroDesenquadrado = desenquadrar(quadroEnquadrado, enquadramento);
-    int[] quadroVerificado = controleErro(quadroDesenquadrado, controller);
+  int[] quadroDesenquadrado = desenquadrar(quadroEnquadrado, enquadramento, controller);
+  int[] quadroVerificado = controleErro(quadroDesenquadrado, controller);
 
-    if (quadroVerificado != null && quadroVerificado.length > 0) {
-        int numeroSequencia = auxiliar.extrairNumeroDeSequencia(quadroVerificado);
+  if (quadroVerificado != null && quadroVerificado.length > 0) 
+  {
+    if(errorOccured == true)
+    {
+      controller.emitirErro("Um erro ocorreu, mas foi devidamente tratado");
+    }
+      int numeroSequencia = auxiliar.extrairNumeroDeSequencia(quadroVerificado);
 
-        // Logica para Retransmissao Seletiva
-        if ("Retransmissão Seletiva".equals(fluxo)) {
-            // Verifica se o quadro esta dentro da janela de recepcao
-            if (numeroSequencia >= proximoNumEsperado && numeroSequencia < proximoNumEsperado + TAMANHO_JANELA_RS) {
-                int[] dados = auxiliar.extrairDados(quadroVerificado);
-                bufferRecepcao.put(numeroSequencia, dados); // Guarda no buffer mesmo que fora de ordem
-                enviarAck(numeroSequencia, controller); // Envia ACK para o quadro que chegou
+    //Escolhe o tipo de controle de fluxo
+    switch (fluxo) 
+    {
+      case "Retransmissão Seletiva":
+          // Verifica se o quadro está dentro da janela de recepção
+          if (numeroSequencia >= proximoNumEsperado && numeroSequencia < proximoNumEsperado + TAMANHO_JANELA_RS) {
+              int[] dados = auxiliar.extrairDados(quadroVerificado);
+              bufferRecepcao.put(numeroSequencia, dados); // Guarda no buffer mesmo que fora de ordem
+              enviarAck(numeroSequencia, controller); // Envia ACK para o quadro que chegou
 
-                // Tenta entregar quadros em sequencia a partir da base
-                while (bufferRecepcao.containsKey(proximoNumEsperado)) {
-                    int[] dadosParaEntregar = bufferRecepcao.remove(proximoNumEsperado);
-                    CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-                    camadaAppRx.receber(dadosParaEntregar, controller);
-                    proximoNumEsperado++; // Desliza a janela de recepcao
-                }
-            } else if (numeroSequencia < proximoNumEsperado) {
-                // Quadro duplicado, o ACK pode ter se perdido. Reenvia o ACK.
-                enviarAck(numeroSequencia, controller);
-            }
-        } else { // Logica para Go-Back-N e Stop-and-Wait
-            if (numeroSequencia == proximoNumEsperado) {
-                int[] dados = auxiliar.extrairDados(quadroVerificado);
-                CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-                camadaAppRx.receber(dados, controller);
-                proximoNumEsperado++;
-                enviarAck(proximoNumEsperado, controller); // ACK para o PROXIMO esperado
-            } else {
-                if ("Deslizante Go-Back-N".equals(fluxo)) {
-                    enviarAck(proximoNumEsperado, controller); // Reenvia ACK do ultimo em ordem
-                }
+              // Tenta entregar quadros em sequência a partir da base
+              while (bufferRecepcao.containsKey(proximoNumEsperado)) {
+                  int[] dadosParaEntregar = bufferRecepcao.remove(proximoNumEsperado);
+                  CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+                  camadaAppRx.receber(dadosParaEntregar, controller);
+                  proximoNumEsperado++; // Desliza a janela de recepção
+              }
+          } else if (numeroSequencia < proximoNumEsperado) {
+              // Quadro duplicado, o ACK pode ter se perdido. Reenvia o ACK.
+              enviarAck(numeroSequencia, controller);
+          }
+          break;
+
+      case "Deslizante Go-Back-N":
+      case "Deslizante 1 bit":
+      default: // A lógica para "Go-Back-N" e "1 bit" é a mesma neste trecho
+        if (numeroSequencia == proximoNumEsperado) {
+            int[] dados = auxiliar.extrairDados(quadroVerificado);
+            CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+            camadaAppRx.receber(dados, controller);
+            proximoNumEsperado++;
+            enviarAck(proximoNumEsperado, controller); // ACK para o PRÓXIMO esperado
+        } else {
+            // Apenas o Go-Back-N precisa reenviar o último ACK em caso de quadro fora de ordem
+            if ("Deslizante Go-Back-N".equals(fluxo)) {
+                enviarAck(proximoNumEsperado, controller); // Reenvia ACK do último em ordem
             }
         }
-    } else {
-        System.out.println("RECEPTOR: Erro detectado no quadro. Descartando.");
-        controller.limparTextAreaMensagemFinal();
-        controller.emitirErro("Um erro ocorreu, mas foi devidamente tratado.");
-    }
+        break;
+    } // Fim do switch
+  } else {
+      System.out.println("RECEPTOR: Erro detectado no quadro. Descartando.");
+      errorOccured = true;
+      System.out.println(errorOccured);
   }
+  } // FIm do metodo
 
 /**************************************************************
 * Metodo: enviarAck
@@ -111,16 +125,44 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
 * @param String enquadramento | enquadramento escolhida
 * @return int[] quadroDesenquadrado | quadro de bits desenquadrado
 * ********************************************************* */
-  private int[] desenquadrar(int[] quadroEnquadrado, String enquadramento)
+  private int[] desenquadrar(int[] quadroEnquadrado, String enquadramento, TelaPrincipalController controller)
   {
     if(auxiliar.isQuadroAck(quadroEnquadrado)) return quadroEnquadrado;
+
+    int[] quadroDesenquadrado;
     switch (enquadramento) {
-        case "Contagem de Caracteres": return auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
-        case "Inserção de Bytes": return auxiliar.desenquadroInsercaoBytes(quadroEnquadrado);
-        case "Inserção de Bits": return auxiliar.desenquadroInsercaoBits(quadroEnquadrado);
-        case "Violação da Camada Física": return auxiliar.desenquadroViolacaoFisica(quadroEnquadrado);
+        case "Contagem de Caracteres": quadroDesenquadrado = auxiliar.desenquadroContagemCaracteres(quadroEnquadrado); break;
+        case "Inserção de Bytes": quadroDesenquadrado = auxiliar.desenquadroInsercaoBytes(quadroEnquadrado); break;
+        case "Inserção de Bits": quadroDesenquadrado = auxiliar.desenquadroInsercaoBits(quadroEnquadrado); break;
+        case "Violação da Camada Física": quadroDesenquadrado = auxiliar.desenquadroViolacaoFisica(quadroEnquadrado); break;
         default: return auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
     }
+
+    String controleErro = controller.getComboBoxControleErro();
+    // FIX: Remove o cabeçalho de comprimento e o preenchimento para combinações incompatíveis
+    if (enquadramento.equals("Inserção de Bytes") &&
+      (controleErro.equals("Código de Hamming") || controleErro.equals("Paridade Par") || controleErro.equals("Paridade Impar"))) {
+
+        if (quadroDesenquadrado != null && quadroDesenquadrado.length >= 16) {
+            // Lê o cabeçalho de 16 bits para descobrir o comprimento original
+            StringBuilder binarioDoTamanho = new StringBuilder();
+            for(int i=0; i<16; i++) {
+                binarioDoTamanho.append(quadroDesenquadrado[i]);
+            }
+            int originalLength = Integer.parseInt(binarioDoTamanho.toString(), 2);
+
+            // Extrai apenas os dados válidos, descartando o preenchimento
+            if (quadroDesenquadrado.length >= 16 + originalLength) {
+                return java.util.Arrays.copyOfRange(quadroDesenquadrado, 16, 16 + originalLength);
+            } else {
+                return null; // Erro de enquadramento, quadro menor que o esperado
+            }
+        } else {
+          return null; // Erro, quadro muito curto para conter o cabeçalho
+        }
+    }
+
+    return quadroDesenquadrado;
   }
 
 /**************************************************************

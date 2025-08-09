@@ -284,16 +284,45 @@ private void pararTemporizador(int numSeq) {
   * @return int[] quadroEnquadrado | quadro de bits ja enquadrado
   * ********************************************************* */
   private int[] enquadramento(int[] bits, String enquadramento)
-  {
-    if(auxiliar.isQuadroAck(bits)) return bits; // Nao enquadra ACKs
-    switch (enquadramento) {
-        case "Contagem de Caracteres": return auxiliar.contagemCaracteres(bits);
-        case "Inserção de Bytes": return auxiliar.insercaoBytes(bits);
-        case "Inserção de Bits": return auxiliar.insercaoBits(bits);
-        case "Violação da Camada Física": return auxiliar.violacaoFisica(bits);
-        default: return auxiliar.contagemCaracteres(bits);
-    }
+{
+  if(auxiliar.isQuadroAck(bits)) return bits; // Nao enquadra ACKs
+
+  int[] dadosParaEnquadrar = bits;
+  String controleErro = controller.getComboBoxControleErro();
+
+  // FIX: Adiciona um cabeçalho de comprimento e preenchimento para combinações incompatíveis
+  if (enquadramento.equals("Inserção de Bytes") &&
+     (controleErro.equals("Código de Hamming") || controleErro.equals("Paridade Par") || controleErro.equals("Paridade Impar"))) {
+
+      int originalLength = bits.length;
+      // Cria um cabeçalho de 16 bits para armazenar o comprimento original
+      String originalLengthBinary = String.format("%16s", Integer.toBinaryString(originalLength)).replace(' ', '0');
+      int[] cabecalho = new int[16];
+      for(int i=0; i<16; i++) {
+          cabecalho[i] = Character.getNumericValue(originalLengthBinary.charAt(i));
+      }
+
+      // Calcula o preenchimento necessário para que o total seja múltiplo de 8
+      int paddingNeeded = (8 - (originalLength % 8)) % 8;
+      int paddedLength = originalLength + paddingNeeded;
+
+      // Cria um novo payload: [cabeçalho de 16 bits][dados originais][preenchimento]
+      int[] payload = new int[16 + paddedLength];
+      System.arraycopy(cabecalho, 0, payload, 0, 16);
+      System.arraycopy(bits, 0, payload, 16, originalLength);
+      // O restante do array (padding) já é preenchido com zeros por padrão em Java.
+
+      dadosParaEnquadrar = payload;
   }
+
+  switch (enquadramento) {
+      case "Contagem de Caracteres": return auxiliar.contagemCaracteres(dadosParaEnquadrar);
+      case "Inserção de Bytes": return auxiliar.insercaoBytes(dadosParaEnquadrar);
+      case "Inserção de Bits": return auxiliar.insercaoBits(dadosParaEnquadrar);
+      case "Violação da Camada Física": return auxiliar.violacaoFisica(dadosParaEnquadrar);
+      default: return auxiliar.contagemCaracteres(dadosParaEnquadrar);
+  }
+}
 
   /**************************************************************
 * Metodo: controleErro
