@@ -32,8 +32,17 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
   String codificacao = controller.getComboBoxCodificacao();
   String fluxo = controller.getComboBoxControleFluxo();
   String finalEnquadramento = enquadramento;
-  if ("Manchester".equals(codificacao) || "Manchester Diferencial".equals(codificacao)) {
-      finalEnquadramento = "Violação da Camada Física";
+
+if (("Manchester".equals(codificacao) || "Manchester Diferencial".equals(codificacao)) && !"Violação da Camada Física".equals(enquadramento)) 
+  {
+    for (int bit : quadroEnquadrado) {
+      if (bit > 1) // Verifica se o bit e 2 ou 3
+      { 
+        System.out.println("RECEPTOR: Erro de sinal Manchester detectado para enquadramento Quadro descartado.");
+        // A ausencia de um ACK fara o transmissor reenviar.
+        return; // Para o processamento deste quadro aqui.
+      }
+    }
   }
 
   if (auxiliar.isQuadroAck(quadroEnquadrado)) return;
@@ -133,12 +142,13 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
     if(auxiliar.isQuadroAck(quadroEnquadrado)) return quadroEnquadrado;
 
     int[] quadroDesenquadrado;
-    switch (enquadramento) {
-        case "Contagem de Caracteres": quadroDesenquadrado = auxiliar.desenquadroContagemCaracteres(quadroEnquadrado); break;
-        case "Inserção de Bytes": quadroDesenquadrado = auxiliar.desenquadroInsercaoBytes(quadroEnquadrado); break;
-        case "Inserção de Bits": quadroDesenquadrado = auxiliar.desenquadroInsercaoBits(quadroEnquadrado); break;
-        case "Violação da Camada Física": quadroDesenquadrado = auxiliar.desenquadroViolacaoFisica(quadroEnquadrado); break;
-        default: return auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
+    switch (enquadramento) 
+    {
+      case "Contagem de Caracteres": quadroDesenquadrado = auxiliar.desenquadroContagemCaracteres(quadroEnquadrado); break;
+      case "Inserção de Bytes": quadroDesenquadrado = auxiliar.desenquadroInsercaoBytes(quadroEnquadrado); break;
+      case "Inserção de Bits": quadroDesenquadrado = auxiliar.desenquadroInsercaoBits(quadroEnquadrado); break;
+      case "Violação da Camada Física": quadroDesenquadrado = auxiliar.desenquadroViolacaoFisica(quadroEnquadrado); break;
+      default: return auxiliar.desenquadroContagemCaracteres(quadroEnquadrado);
     }
 
     String controleErro = controller.getComboBoxControleErro();
@@ -146,20 +156,21 @@ public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) 
     if (enquadramento.equals("Inserção de Bytes") &&
       (controleErro.equals("Código de Hamming") || controleErro.equals("Paridade Par") || controleErro.equals("Paridade Impar"))) {
 
-        if (quadroDesenquadrado != null && quadroDesenquadrado.length >= 16) {
-            // Lê o cabeçalho de 16 bits para descobrir o comprimento original
-            StringBuilder binarioDoTamanho = new StringBuilder();
-            for(int i=0; i<16; i++) {
-                binarioDoTamanho.append(quadroDesenquadrado[i]);
-            }
-            int originalLength = Integer.parseInt(binarioDoTamanho.toString(), 2);
+        if (quadroDesenquadrado != null && quadroDesenquadrado.length >= 16) 
+        {
+          // Lê o cabeçalho de 16 bits para descobrir o comprimento original
+          StringBuilder binarioDoTamanho = new StringBuilder();
+          for(int i=0; i<16; i++) {
+              binarioDoTamanho.append(quadroDesenquadrado[i]);
+          }
+          int originalLength = Integer.parseInt(binarioDoTamanho.toString(), 2);
 
-            // Extrai apenas os dados válidos, descartando o preenchimento
-            if (quadroDesenquadrado.length >= 16 + originalLength) {
-                return java.util.Arrays.copyOfRange(quadroDesenquadrado, 16, 16 + originalLength);
-            } else {
-                return null; // Erro de enquadramento, quadro menor que o esperado
-            }
+          // Extrai apenas os dados válidos, descartando o preenchimento
+          if (quadroDesenquadrado.length >= 16 + originalLength) {
+              return java.util.Arrays.copyOfRange(quadroDesenquadrado, 16, 16 + originalLength);
+          } else {
+              return null; // Erro de enquadramento, quadro menor que o esperado
+          }
         } else {
           return null; // Erro, quadro muito curto para conter o cabeçalho
         }

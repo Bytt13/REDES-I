@@ -368,23 +368,41 @@ public class FuncoesAuxiliares {
   public int[] desenquadroInsercaoBits(int[] quadroEnquadrado)
   {
     if (isQuadroAck(quadroEnquadrado)) return quadroEnquadrado; // ACKs nao sao desenquadrados
-    ArrayList<Integer> quadroSemStuffing = new ArrayList<>();
-    int[] FLAG = {0,1,1,1,1,1,1,0};
-    if (quadroEnquadrado.length < 16 || !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, 0, 8), FLAG) || !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, quadroEnquadrado.length - 8, quadroEnquadrado.length), FLAG)) {
-        return quadroEnquadrado;
-    }
-    int contadorDeUns = 0;
-    for(int i = 8; i < quadroEnquadrado.length - 8; i++) {
-      int bit = quadroEnquadrado[i];
-      if(contadorDeUns == 5 && bit == 0) {
-        contadorDeUns = 0;
-      } else {
-        quadroSemStuffing.add(bit);
-        if(bit == 1) contadorDeUns++;
-        else contadorDeUns = 0;
+      int[] FLAG = {0,1,1,1,1,1,1,0};
+      if (quadroEnquadrado == null || quadroEnquadrado.length < 16 ||
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, 0, 8), FLAG) ||
+        !Arrays.equals(Arrays.copyOfRange(quadroEnquadrado, quadroEnquadrado.length - 8, quadroEnquadrado.length), FLAG)) {
+        // Se o quadro nao tem as flags corretas, nao ha como desenquadra-lo. Retorna null.
+        return null;
       }
-    }
-    return arrayListToArrayInt(quadroSemStuffing);
+
+      ArrayList<Integer> quadroSemStuffing = new ArrayList<>();
+      int contadorDeUns = 0;
+
+      // Itera apenas sobre os dados, excluindo as flags de inicio e fim.
+      for (int i = 8; i < quadroEnquadrado.length - 8; i++) 
+      {
+        int bit = quadroEnquadrado[i];
+        if (contadorDeUns == 5) {
+            if (bit == 0) {
+                // Este '0' e um bit de stuffing, entao o ignoramos.
+                contadorDeUns = 0; // Reseta o contador.
+            } else {
+                // Se for '1' apos cinco '1's, e uma violacao do protocolo.
+                // Isso indica um erro, o quadro todo e invalido.
+                return null;
+            }
+        } else {
+            // Adiciona o bit de dados ao resultado.
+            quadroSemStuffing.add(bit);
+            if (bit == 1) {
+                contadorDeUns++;
+            } else {
+                contadorDeUns = 0;
+            }
+        }
+      }
+      return arrayListToArrayInt(quadroSemStuffing);
   }
 
   /**************************************************************
