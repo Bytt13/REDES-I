@@ -8,12 +8,16 @@ Autor..............: Lucas de Menezes Chaves
 *************************************************************** */
 package model;
 
+import java.util.Map;
+import java.util.HashMap;
 import controller.TelaPrincipalController;
 import utils.FuncoesAuxiliares;
 
 public class CamadaEnlaceDadosReceptora {
   FuncoesAuxiliares auxiliar = new FuncoesAuxiliares(); // Cria objeto de funcoes auxiliares para termos rapidez na hora de programar
   private static int proximoNumEsperado = 0; // Variavel estatica para rastrear a sequencia esperada
+  private static Map<Integer, int[]> bufferRecepcao = new HashMap<>(); // Buffer para retransmissao seletiva
+  private static final int TAMANHO_JANELA_RS = 4; // tamanho da janela da retransmissao seletiva
 
 /**************************************************************
 * Metodo: receber
@@ -22,13 +26,11 @@ public class CamadaEnlaceDadosReceptora {
 * @param TelaPrincipalController controller | controller para conseguirmos gerenciar a tela
 * @return void
 * ********************************************************* */
-  public void receber(int[] quadroEnquadrado, TelaPrincipalController controller)
-  {
+public void receber(int[] quadroEnquadrado, TelaPrincipalController controller) {
     String enquadramento = controller.getComboBoxEnquadramento();
     String fluxo = controller.getComboBoxControleFluxo();
 
-    // Se um ACK chegou aqui, e um erro, apenas ignoramos.
-    if(auxiliar.isQuadroAck(quadroEnquadrado)) return;
+    if (auxiliar.isQuadroAck(quadroEnquadrado)) return;
 
     int[] quadroDesenquadrado = desenquadrar(quadroEnquadrado, enquadramento);
     int[] quadroVerificado = controleErro(quadroDesenquadrado, controller);
@@ -36,30 +38,42 @@ public class CamadaEnlaceDadosReceptora {
     if (quadroVerificado != null && quadroVerificado.length > 0) {
         int numeroSequencia = auxiliar.extrairNumeroDeSequencia(quadroVerificado);
 
-        // Verifica se o quadro recebido e o esperado
-        if(numeroSequencia == proximoNumEsperado) {
-          //System.out.println("RECEPTOR: Quadro " + numeroSequencia + " recebido corretamente.");
-          int[] dados = auxiliar.extrairDados(quadroVerificado);
-          
-          CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
-          camadaAppRx.receber(dados, controller);
+        // Logica para Retransmissao Seletiva
+        if ("Retransmissão Seletiva".equals(fluxo)) {
+            // Verifica se o quadro esta dentro da janela de recepcao
+            if (numeroSequencia >= proximoNumEsperado && numeroSequencia < proximoNumEsperado + TAMANHO_JANELA_RS) {
+                int[] dados = auxiliar.extrairDados(quadroVerificado);
+                bufferRecepcao.put(numeroSequencia, dados); // Guarda no buffer mesmo que fora de ordem
+                enviarAck(numeroSequencia, controller); // Envia ACK para o quadro que chegou
 
-          proximoNumEsperado++; // Atualiza o proximo quadro que esperamos
-
-          // Envia o ACK confirmando que recebeu o quadro e agora espera o proximo.
-          enviarAck(proximoNumEsperado, controller);
-        } else {
-          //System.out.println("RECEPTOR: Quadro " + numeroSequencia + " fora de ordem. Esperando " + proximoNumEsperado + ". Descartando.");
-          // No Go-Back-N, quando um quadro fora de ordem chega, o receptor reenvia o ACK do ultimo quadro que ele recebeu corretamente
-          // para informar ao transmissor qual e o proximo que ele realmente espera.
-          if ("Deslizante Go-Back-N".equals(fluxo)) {
-             enviarAck(proximoNumEsperado, controller);
-          }
+                // Tenta entregar quadros em sequencia a partir da base
+                while (bufferRecepcao.containsKey(proximoNumEsperado)) {
+                    int[] dadosParaEntregar = bufferRecepcao.remove(proximoNumEsperado);
+                    CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+                    camadaAppRx.receber(dadosParaEntregar, controller);
+                    proximoNumEsperado++; // Desliza a janela de recepcao
+                }
+            } else if (numeroSequencia < proximoNumEsperado) {
+                // Quadro duplicado, o ACK pode ter se perdido. Reenvia o ACK.
+                enviarAck(numeroSequencia, controller);
+            }
+        } else { // Logica para Go-Back-N e Stop-and-Wait
+            if (numeroSequencia == proximoNumEsperado) {
+                int[] dados = auxiliar.extrairDados(quadroVerificado);
+                CamadaAplicacaoReceptora camadaAppRx = new CamadaAplicacaoReceptora();
+                camadaAppRx.receber(dados, controller);
+                proximoNumEsperado++;
+                enviarAck(proximoNumEsperado, controller); // ACK para o PROXIMO esperado
+            } else {
+                if ("Deslizante Go-Back-N".equals(fluxo)) {
+                    enviarAck(proximoNumEsperado, controller); // Reenvia ACK do ultimo em ordem
+                }
+            }
         }
     } else {
-      // Se o quadro veio com erro, ele e descartado e nenhum ACK e enviado.
-      // Isso forca o timeout do lado do transmissor.
-      System.out.println("RECEPTOR: Erro detectado no quadro. Descartando e nao enviando ACK.");
+        System.out.println("RECEPTOR: Erro detectado no quadro. Descartando.");
+        controller.limparTextAreaMensagemFinal();
+        controller.emitirErro("Um erro ocorreu, mas foi devidamente tratado.");
     }
   }
 
@@ -70,9 +84,9 @@ public class CamadaEnlaceDadosReceptora {
 * @param TelaPrincipalController controller | O controller da GUI.
 * @return void
 * ********************************************************* */
-  private void enviarAck(int proximoEsperado, TelaPrincipalController controller) {
+  private void enviarAck(int numeroAck, TelaPrincipalController controller) {
     //System.out.println("RECEPTOR: Preparando para enviar ACK para o proximo quadro esperado: " + proximoEsperado);
-    int[] ackFrame = auxiliar.criarQuadroAck(proximoEsperado);
+    int[] ackFrame = auxiliar.criarQuadroAck(numeroAck);
 
     // O ACK tambem precisa passar pela camada fisica para ser "enviado"
     String codificacao = controller.getComboBoxCodificacao();

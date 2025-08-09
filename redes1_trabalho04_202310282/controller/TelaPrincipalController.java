@@ -231,4 +231,17 @@ public String getComboBoxControleFluxo()
 {
   return comboBoxFluxo.getValue();
 } // Fim do metodo
+
+/**************************************************************
+* Metodo: limparTextAreaMensagemFinal
+* Funcao: Limpa o campo de texto da mensagem final.
+* @param void
+* @return void
+* ********************************************************* */
+  public void limparTextAreaMensagemFinal()
+  {
+    Platform.runLater(() -> {
+      textAreaMensagemFinal.clear();
+    });
+  } // Fim do metodo
 }
