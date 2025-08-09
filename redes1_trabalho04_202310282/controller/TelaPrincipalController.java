@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import model.AplicacaoTransmissora;
+import model.CamadaEnlaceDadosReceptora;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ComboBox;
 import javafx.application.Platform;
@@ -89,6 +90,7 @@ public class TelaPrincipalController {
     String mensagem = textAreaMensagemOriginal.getText(); // Guarda a mensagem numa variavel tipo string
     String codificacao = comboBoxCodificacao.getValue(); // Guarda a codificacao escolhida
 
+    CamadaEnlaceDadosReceptora.reset();
     // Validacao para nao aceitar mensagens vazias
     if(mensagem == null || mensagem.trim().isEmpty())
     {

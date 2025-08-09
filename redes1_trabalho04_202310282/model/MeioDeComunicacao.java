@@ -1,8 +1,8 @@
-/***************************************************************** 
+/*****************************************************************
 Autor..............: Lucas de Menezes Chaves
 * Matricula........: 202310282
-* Inicio...........: 
-* Ultima alteracao.: 
+* Inicio...........:
+* Ultima alteracao.:
 * Nome.............: MeioDeComunicacao
 * Funcao...........: Transfere a mensagem codificada da camada transmissora para receptora
 *************************************************************** */
@@ -11,67 +11,67 @@ package model;
 import java.util.Arrays;
 import java.util.Random;
 import controller.TelaPrincipalController;
-//import que vamos precisar
+import utils.FuncoesAuxiliares;
 
 public class MeioDeComunicacao {
+  private FuncoesAuxiliares auxiliar = new FuncoesAuxiliares();
 
 /**************************************************************
 * Metodo: transferir
 * Funcao: transfere a mensagem em forma de bits codificados para a proxima camada, e aplica um erro caso ocorra
-* @param int[] fluxoBrutoDeBits | fluxo de bits recebido
+* @param int[] fluxoBrutoDeBitsPontoA | fluxo de bits recebido
 * @param String codificacao | codificacao escolhida
 * @param String erro | taxa de erro escolhida
 * @param TelaPrincipalController controller | controller para conseguirmos gerenciar a tela
-* @return void 
+* @return void
 * ********************************************************* */
   public void transferir(int[] fluxoBrutoDeBitsPontoA, String codificacao, String erro, TelaPrincipalController controller)
-  { 
-    int[] fluxoBrutoDeBitsPontoB = new int[fluxoBrutoDeBitsPontoA.length];
-    // Gera um numero aleatorio entre 0 e 99
+  {
+    // 1. Verifica se o quadro e um ACK
+    if (auxiliar.isQuadroAck(fluxoBrutoDeBitsPontoA)) {
+        System.out.println("MEIO: Quadro de ACK detectado. Enviando de volta para o Transmissor...");
+        // Em vez de ir para o receptor, o ACK volta para a camada de enlace transmissora.
+        // ACKs sao enviados sem erro para simplificar a simulacao.
+        CamadaEnlaceDadosTransmissora.receberAck(fluxoBrutoDeBitsPontoA);
+        return; // A transferencia do ACK termina aqui.
+    }
+
+    // 2. Logica original para transferencia de DADOS (com possivel erro)
+    // ... (dentro do método transferir)
+    int[] fluxoBrutoDeBitsPontoB;
     Random rand = new Random();
-    int numeroSorteado = rand.nextInt(100); 
-    // Simula o erro com probabilidade definida pela GUI
+
     try {
       String valorErro = erro.replace("%", "").trim();
       int chanceErro = Integer.parseInt(valorErro);
-      
-      // Tenta simular um erro se a chance dele acontecer for maior que 0
-      if(chanceErro > 0)
-      {
-        for(int i = 0; i < fluxoBrutoDeBitsPontoA.length; i++)
-        {
-          
-          // Compara com a chance de erro. Agora a probabilidade sera respeitada para cada bit.
-          if(numeroSorteado < chanceErro)
-          {
-            fluxoBrutoDeBitsPontoB[i] = 1 - fluxoBrutoDeBitsPontoA[i]; // Inverte o bit
-          }
-          else
-          {
-            fluxoBrutoDeBitsPontoB[i] = fluxoBrutoDeBitsPontoA[i]; // Mantem o bit
-          }
+
+      // Comecamos com uma copia perfeita do quadro original.
+      fluxoBrutoDeBitsPontoB = Arrays.copyOf(fluxoBrutoDeBitsPontoA, fluxoBrutoDeBitsPontoA.length);
+
+      // Sorteamos UMA VEZ para ver se o quadro tera erro.
+      if (rand.nextInt(100) < chanceErro) {
+        System.out.println("MEIO: Um erro foi introduzido no quadro!");
+        // Se o quadro foi "sorteado" para ter erro, invertemos um bit aleatorio.
+        if (fluxoBrutoDeBitsPontoA.length > 0) {
+          int bitParaInverter = rand.nextInt(fluxoBrutoDeBitsPontoA.length);
+          fluxoBrutoDeBitsPontoB[bitParaInverter] = 1 - fluxoBrutoDeBitsPontoA[bitParaInverter];
         }
       }
-      else
-      {
-        // Se a chance de erro eh 0%, apenas copia o array original.
-        fluxoBrutoDeBitsPontoB = Arrays.copyOf(fluxoBrutoDeBitsPontoA, fluxoBrutoDeBitsPontoA.length);
-      }
-    } catch(NumberFormatException e) // Caso haja alguma excecao
-    {
+    } catch(NumberFormatException e) {
       e.printStackTrace();
+      fluxoBrutoDeBitsPontoB = Arrays.copyOf(fluxoBrutoDeBitsPontoA, fluxoBrutoDeBitsPontoA.length);
     }
-    
-    StringBuilder bitsParaMostrar = new StringBuilder(); // Cria o string builder
-    for(int bit : fluxoBrutoDeBitsPontoB)
-    {
+
+    // 3. Exibe e envia o quadro de DADOS para o receptor
+    StringBuilder bitsParaMostrar = new StringBuilder();
+    for(int bit : fluxoBrutoDeBitsPontoB) {
       bitsParaMostrar.append(bit);
     }
 
-    controller.setTextFieldSinal(bitsParaMostrar.toString()); // Mostra a mensagem codificada no painel receptor
-    System.out.println("O codigo saiu da camada meio de comunicacao");
+    controller.setTextFieldSinal(bitsParaMostrar.toString());
+    System.out.println("MEIO: Quadro de DADOS atravessou o meio de comunicacao");
     System.out.println(Arrays.toString(fluxoBrutoDeBitsPontoB));
-    // Repassa a mensagem para proxima camada
+
     CamadaFisicaReceptora fisicaRx = new CamadaFisicaReceptora();
     fisicaRx.receber(fluxoBrutoDeBitsPontoB, codificacao, controller);
   }
