@@ -75,7 +75,7 @@ public class TelaPrincipalController {
     // Chamada da camada de aplicacao transmissora
     AplicacaoTransmissora appTx = new AplicacaoTransmissora();
     appTx.enviarMensagem(mensagem, codificacao, this);
-  }
+  } // fim do metodo
 
   /****************************************************************
   * Metodo: setTextFieldBits
